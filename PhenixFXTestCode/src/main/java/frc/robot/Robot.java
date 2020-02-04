@@ -13,8 +13,6 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import edu.wpi.first.wpilibj.Joystick;
-import frc.robot.subsystems.DriveSubsystem;
-
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -39,10 +37,10 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    fxConfig.primaryPID.selectedFeedbackSensor = FeedbackDevice.IntegratedSensor; 
+    fxConfig.primaryPID.selectedFeedbackSensor = FeedbackDevice.IntegratedSensor; //Selecting Feedback Sensor
 
     talonFX.configAllSettings(fxConfig); 
-    talonFX.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 100);
+    talonFX.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 50);
 
     talonFX.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
   }
@@ -58,7 +56,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
 
-    //SmartDashboard.putNumber("talon pos", talonFX.getSelectedSensorPosition());
+    //outputs things to SmartDashboard/Shuffleboard
     SmartDashboard.putNumber("talon ID 40 pos", talonFX.getSelectedSensorPosition());
     SmartDashboard.putNumber("talon ID 40 velocity", talonFX.getSelectedSensorVelocity());
 
@@ -91,7 +89,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    double stick = _Joystick.getRawAxis(1);
+    double stick = _Joystick.getRawAxis(1) * -1; //makes forward positive
     talonFX.set(ControlMode.PercentOutput, stick);
   }
 
