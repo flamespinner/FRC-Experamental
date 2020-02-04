@@ -9,6 +9,8 @@ package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.InvertType;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
@@ -25,11 +27,20 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class Robot extends TimedRobot {
 
-  private TalonFX talonFX = new TalonFX(40);
-  
-  private TalonFXConfiguration fxConfig = new TalonFXConfiguration();
+  private final TalonFX talonFX = new TalonFX(40); //Falcon 40
 
-  private Joystick _Joystick = new Joystick(0);
+  /**Drivebase Code */
+  private final TalonFX falconFR = new TalonFX(41); //Right
+  private final TalonFX falconBR = new TalonFX(42); //Right
+  private final TalonFX falconFL = new TalonFX(43); //Left
+  private final TalonFX falconBL = new TalonFX(44); //Left
+  
+  /**End of Drivebase Code */
+  
+  private final TalonFXConfiguration fxConfig = new TalonFXConfiguration();
+
+  private final Joystick _JoystickR = new Joystick(0);
+  private final Joystick _JoystickL = new Joystick(1);
 
   /**
    * This function is run when the robot is first started up and should be
@@ -37,12 +48,51 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
+    /**setting coast or brake mode, can also be done in Phoenix tuner */
+    talonFX.setNeutralMode(NeutralMode.Brake);
+    falconFR.setNeutralMode(NeutralMode.Brake);
+    falconFL.setNeutralMode(NeutralMode.Brake);
+    falconBR.setNeutralMode(NeutralMode.Brake);
+    falconBL.setNeutralMode(NeutralMode.Brake);
+    /**end of setting modes */
+
+    /**set ramp */
+    falconFR.configOpenloopRamp(0.5); // 0.5 seconds from neutral to full output (during open-loop control)
+    falconFR.configClosedloopRamp(0); // 0 disables ramping (during closed-loop control)
+
+    falconFL.configOpenloopRamp(0.5); // 0.5 seconds from neutral to full output (during open-loop control)
+    falconFL.configClosedloopRamp(0); // 0 disables ramping (during closed-loop control)
+
+    falconBL.configOpenloopRamp(0.5); // 0.5 seconds from neutral to full output (during open-loop control)
+    falconBL.configClosedloopRamp(0); // 0 disables ramping (during closed-loop control)
+
+    falconBR.configOpenloopRamp(0.5); // 0.5 seconds from neutral to full output (during open-loop control)
+    falconBR.configClosedloopRamp(0); // 0 disables ramping (during closed-loop control)
+    /**end set ramp */
+
+    /**Drive Base Code Start */
+    falconBR.follow(falconFR); //talonBR follows TalonFR
+    falconBL.follow(falconFL); //talonBL follows TalonFR 
+
+    falconFR.setInverted(false); //set to invert falconFR.. CW/CCW.. Green = forward (motor led)
+    falconBR.setInverted(InvertType.FollowMaster); //matches whatever falconFR is
+
+    falconFL.setInverted(false); //set to invert falconFL.. CW/CCW.. Green = foward (motor led)
+    falconBL.setInverted(InvertType.FollowMaster); //matches whatever falcon FL is
+    /**Drive Base Code End */
+
+    /**Encoder Code Start */
     fxConfig.primaryPID.selectedFeedbackSensor = FeedbackDevice.IntegratedSensor; //Selecting Feedback Sensor
 
     talonFX.configAllSettings(fxConfig); 
     talonFX.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 50);
 
     talonFX.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
+    /**Encoder Code End */
+
+    /**other */
+    //talonFX.configVoltageCompSaturation(11); //voltage comparison
+    /**end other */
   }
 
   /**
@@ -89,7 +139,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    double stick = _Joystick.getRawAxis(1) * -1; //makes forward positive
+    final double stick = _JoystickL.getRawAxis(1) * -1; //makes forward positive
+    final double stick1 = _JoystickR.getRawAxis(1) * -1;
     talonFX.set(ControlMode.PercentOutput, stick);
   }
 
