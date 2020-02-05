@@ -17,7 +17,11 @@ import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -45,6 +49,10 @@ public class Robot extends TimedRobot {
   private final Joystick _JoystickR = new Joystick(0);
   private final Joystick _JoystickL = new Joystick(1);
   XboxController xbox = new XboxController(3);
+
+  private DifferentialDrive drive = new DifferentialDrive(
+    new SpeedControllerGroup((SpeedController)falconFL, (SpeedController)falconBL), 
+    new SpeedControllerGroup((SpeedController)falconFR, (SpeedController)falconBR)); 
 
   /**
    * This function is run when the robot is first started up and should be
@@ -109,7 +117,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-
+    drive.tankDrive(xbox.getY(Hand.kLeft), xbox.getY(Hand.kRight));
     //outputs things to SmartDashboard/Shuffleboard
  //   SmartDashboard.putNumber("talon ID 40 pos", talonFX.getSelectedSensorPosition());
  //   SmartDashboard.putNumber("talon ID 40 velocity", talonFX.getSelectedSensorVelocity());
