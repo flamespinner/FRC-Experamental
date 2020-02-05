@@ -117,12 +117,15 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    drive.tankDrive(xbox.getY(Hand.kLeft), xbox.getY(Hand.kRight));
+    drive.arcadeDrive(Math.abs(xbox.getTriggerAxis(Hand.kRight) - xbox.getTriggerAxis(Hand.kLeft)), 
+                      xbox.getY(Hand.kLeft)); 
     //outputs things to SmartDashboard/Shuffleboard
  //   SmartDashboard.putNumber("talon ID 40 pos", talonFX.getSelectedSensorPosition());
  //   SmartDashboard.putNumber("talon ID 40 velocity", talonFX.getSelectedSensorVelocity());
 
   }
+
+  
 
   /**
    * This autonomous (along with the chooser code above) shows how to select
