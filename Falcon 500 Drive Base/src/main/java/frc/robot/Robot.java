@@ -162,11 +162,11 @@ public class Robot extends TimedRobot {
 //    final double xstick = xbox.getRawAxis(1) * -1;
 //    final double xstick1 = xbox.getRawAxis(2) * -1;
   //    talonFX.set(ControlMode.PercentOutput, stick);
-  falconFR.set(ControlMode.PercentOutput, RT);
-  falconBR.set(ControlMode.PercentOutput, RT);
+  //falconFR.set(ControlMode.PercentOutput, RT);
+  //falconBR.set(ControlMode.PercentOutput, RT);
 
-  falconFL.set(ControlMode.PercentOutput, LT);
-  falconBL.set(ControlMode.PercentOutput, LT);
+  //falconFL.set(ControlMode.PercentOutput, LT);
+  //falconBL.set(ControlMode.PercentOutput, LT);
   }
 
   /**
