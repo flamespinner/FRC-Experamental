@@ -50,9 +50,8 @@ public class Robot extends TimedRobot {
   private final Joystick _JoystickL = new Joystick(1);
   XboxController xbox = new XboxController(3);
 
-  private DifferentialDrive drive = new DifferentialDrive(
-    new SpeedControllerGroup((SpeedController)falconFL, (SpeedController)falconBL), 
-    new SpeedControllerGroup((SpeedController)falconFR, (SpeedController)falconBR)); 
+  private AnnyDDrive drive = new AnnyDDrive( falconFL, falconBL, 
+                                             falconFR, falconBR); 
 
   /**
    * This function is run when the robot is first started up and should be
