@@ -60,8 +60,7 @@ public class Robot extends TimedRobot {
   private final Joystick _JoystickL = new Joystick(1);
   XboxController xbox = new XboxController(3);
 
-  private AnnyDDrive drive = new AnnyDDrive( falconFL, falconBL, 
-                                             falconFR, falconBR); 
+  private AnnyDDrive drive = new AnnyDDrive(falconFR, falconBR, falconFL, falconBL); 
 
   /**
    * This function is run when the robot is first started up and should be
@@ -185,7 +184,12 @@ public class Robot extends TimedRobot {
   public void testPeriodic() {
   }
 }
-
+/**
+ * <p> Diifrential Drive with TalonFX controllers
+ * BR and BL follow FR and FL
+ * 
+ * @param FR, BR, FL, BL
+ */
 class AnnyDDrive extends RobotDriveBase implements Sendable, AutoCloseable {
   public static final double kDefaultQuickStopThreshold = 0.2;
   public static final double kDefaultQuickStopAlpha = 0.1;
@@ -213,8 +217,8 @@ class AnnyDDrive extends RobotDriveBase implements Sendable, AutoCloseable {
       SendableRegistry.addChild(this, BR);
       SendableRegistry.addChild(this, FL);
       SendableRegistry.addChild(this, BL);
-      m_FR.follow(BR);
-      m_FL.follow(BL);
+      m_BR.follow(FR);
+      m_BL.follow(FL);
       instances++;
       SendableRegistry.addLW(this, "AnnyDDrive", instances);
   }
