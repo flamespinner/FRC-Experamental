@@ -9,6 +9,7 @@ package frc.robot;
 
 import java.util.StringJoiner;
 
+import com.analog.adis16448.frc.ADIS16448_IMU;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.InvertType;
@@ -58,7 +59,9 @@ public class Robot extends TimedRobot {
 
   private final Joystick _JoystickR = new Joystick(0);
   private final Joystick _JoystickL = new Joystick(1);
-  XboxController xbox = new XboxController(3);
+  private XboxController xbox = new XboxController(3);
+
+  private final ADIS16448_IMU imu = new ADIS16448_IMU();
 
   private AnnyDDrive drive = new AnnyDDrive(falconFR, falconBR, falconFL, falconBL); 
 
@@ -68,6 +71,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
+    imu.calibrate();
+    imu.reset();
     /**setting coast or brake mode, can also be done in Phoenix tuner */
 //    talonFX.setNeutralMode(NeutralMode.Brake);
     falconFR.setNeutralMode(NeutralMode.Brake);
@@ -125,8 +130,9 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    drive.arcadeDrive(Math.abs(xbox.getTriggerAxis(Hand.kRight) - xbox.getTriggerAxis(Hand.kLeft)), 
-                      xbox.getY(Hand.kLeft)); 
+    SmartDashboard.putNumber("Angle", imu.getGyroAngleX());
+    /*drive.arcadeDrive(Math.abs(xbox.getTriggerAxis(Hand.kRight) - xbox.getTriggerAxis(Hand.kLeft)), 
+                      xbox.getY(Hand.kLeft)); */
     //outputs things to SmartDashboard/Shuffleboard
  //   SmartDashboard.putNumber("talon ID 40 pos", talonFX.getSelectedSensorPosition());
  //   SmartDashboard.putNumber("talon ID 40 velocity", talonFX.getSelectedSensorVelocity());
