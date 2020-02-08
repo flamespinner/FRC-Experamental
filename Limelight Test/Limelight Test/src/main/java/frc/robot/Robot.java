@@ -49,10 +49,10 @@ public class Robot extends TimedRobot {
   double area = ta.getDouble(0.0);
   double target = tv.getDouble(0.0);
 
-  private final WPI_TalonSRX FR = new WPI_TalonSRX(1);
-  private final WPI_TalonSRX FL = new WPI_TalonSRX(2);
-  private final WPI_TalonSRX BR = new WPI_TalonSRX(3);
-  private final WPI_TalonSRX BL = new WPI_TalonSRX(4);
+  private final WPI_TalonSRX FR = new WPI_TalonSRX(5);
+  private final WPI_TalonSRX FL = new WPI_TalonSRX(9);
+  private final WPI_TalonSRX BR = new WPI_TalonSRX(8);
+  private final WPI_TalonSRX BL = new WPI_TalonSRX(3);
 
   private final SpeedControllerGroup SCGRight = new SpeedControllerGroup(FR, BR);
   private final SpeedControllerGroup SCGLeft = new SpeedControllerGroup(FL, BL);
