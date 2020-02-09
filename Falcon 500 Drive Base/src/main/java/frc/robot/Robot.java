@@ -9,7 +9,7 @@ package frc.robot;
 
 import java.util.StringJoiner;
 
-import com.analog.adis16448.frc.ADIS16448_IMU;
+//import com.analog.adis16448.frc.ADIS16448_IMU;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.InvertType;
@@ -21,6 +21,7 @@ import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Sendable;
@@ -45,25 +46,31 @@ import edu.wpi.first.wpiutil.math.MathUtil;
  */
 public class Robot extends TimedRobot {
 
-//  private final TalonFX talonFX = new TalonFX(40); //Falcon 40
-
   /**Drivebase Code */
-  private final TalonFX falconFR = new TalonFX(42); //Right
-  private final TalonFX falconBR = new TalonFX(43); //Right
-  private final TalonFX falconFL = new TalonFX(41); //Left
-  private final TalonFX falconBL = new TalonFX(44); //Left
-  
+  private final TalonFX falconBL = new TalonFX(42); //Right
+  private final TalonFX falconFL = new TalonFX(43); //Right
+  private final TalonFX falconBR = new TalonFX(41); //Left
+  private final TalonFX falconFR = new TalonFX(44); //Left
+
+  private double i_falconBL;
+  private double i_falconBR;
+  private double i_falconFL;
+  private double i_falconFR;
+
   /**End of Drivebase Code */
   
   private final TalonFXConfiguration fxConfig = new TalonFXConfiguration();
+  private XboxController xbox = new XboxController(3); 
 
-  private final Joystick _JoystickR = new Joystick(0);
-  private final Joystick _JoystickL = new Joystick(1);
-  private XboxController xbox = new XboxController(3);
+  private AnnyDDrive drive = new AnnyDDrive(falconFR, falconBR, falconFL, falconBL);
+  private AnalogGyro gyro = new AnalogGyro(0);
 
-  private final ADIS16448_IMU imu = new ADIS16448_IMU();
+  private static final double kAngleSetpoint = 0.0;
+  private static final double kP = 0.005; // propotional turning constant
 
-  private AnnyDDrive drive = new AnnyDDrive(falconFR, falconBR, falconFL, falconBL); 
+	// gyro calibration constant, may need to be adjusted;
+	// gyro value of 360 is set to correspond to one full revolution
+  private static final double kVoltsPerDegreePerSecond = 0.0128;
 
   /**
    * This function is run when the robot is first started up and should be
@@ -71,8 +78,12 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    imu.calibrate();
-    imu.reset();
+    gyro.setSensitivity(kVoltsPerDegreePerSecond);
+    //gyro.calibrate();
+    gyro.reset();
+   //falconFR.configIntegratedSensorInitializationStrategy(fxConfig.initializationStrategy.BootToAbsolutePosition);
+    //fxConfig.initializationStrategy.BootToZero
+
     /**setting coast or brake mode, can also be done in Phoenix tuner */
 //    talonFX.setNeutralMode(NeutralMode.Brake);
     falconFR.setNeutralMode(NeutralMode.Brake);
@@ -99,10 +110,10 @@ public class Robot extends TimedRobot {
     falconBR.follow(falconFR); //talonBR follows TalonFR
     falconBL.follow(falconFL); //talonBL follows TalonFR 
 
-    falconFR.setInverted(false); //set to invert falconFR.. CW/CCW.. Green = forward (motor led)
+    falconFR.setInverted(true); //set to invert falconFR.. CW/CCW.. Green = forward (motor led)
     falconBR.setInverted(InvertType.FollowMaster); //matches whatever falconFR is
 
-    falconFL.setInverted(false); //set to invert falconFL.. CW/CCW.. Green = foward (motor led)
+    falconFL.setInverted(true); //set to invert falconFL.. CW/CCW.. Green = foward (motor led)
     falconBL.setInverted(InvertType.FollowMaster); //matches whatever falcon FL is
     /**Drive Base Code End */
 
@@ -118,6 +129,10 @@ public class Robot extends TimedRobot {
     /**other */
     //talonFX.configVoltageCompSaturation(11); //voltage comparison
     /**end other */
+    i_falconBL = falconBL.getSelectedSensorPosition() * ((Math.PI)/2014)/10.75;
+    i_falconBR = falconBR.getSelectedSensorPosition() * ((Math.PI)/2014)/10.75;
+    i_falconFL = falconFL.getSelectedSensorPosition() * ((Math.PI)/2014)/10.75;
+    i_falconFR = falconFR.getSelectedSensorPosition() * ((Math.PI)/2014)/10.75;
   }
 
   /**
@@ -128,15 +143,42 @@ public class Robot extends TimedRobot {
    * <p>This runs after the mode specific periodic functions, but before
    * LiveWindow and SmartDashboard integrated updating.
    */
-  @Override
+  @Override 
   public void robotPeriodic() {
-    SmartDashboard.putNumber("Angle", imu.getGyroAngleX());
-    /*drive.arcadeDrive(Math.abs(xbox.getTriggerAxis(Hand.kRight) - xbox.getTriggerAxis(Hand.kLeft)), 
-                      xbox.getY(Hand.kLeft)); */
-    //outputs things to SmartDashboard/Shuffleboard
- //   SmartDashboard.putNumber("talon ID 40 pos", talonFX.getSelectedSensorPosition());
- //   SmartDashboard.putNumber("talon ID 40 velocity", talonFX.getSelectedSensorVelocity());
+    double turningValue = (kAngleSetpoint - gyro.getAngle()) * kP;
+    turningValue = Math.copySign(turningValue, xbox.getY(Hand.kLeft));
+    drive.arcadeDrive(xbox.getY(Hand.kLeft), turningValue); 
 
+    /*drive.arcadeDrive(Math.abs(xbox.getTriggerAxis(Hand.kLeft)) - Math.abs((xbox.getTriggerAxis(Hand.kRight))), 
+                      -xbox.getX(Hand.kLeft));*/
+
+    //outputs things to SmartDashboard/Shuffleboard
+    //SmartDashboard.putNumber("Angle", imu.getGyroAngleX());
+    SmartDashboard.putNumber("FR pos", getRealPosition_FT(falconFR));
+    SmartDashboard.putNumber("BR pos", getRealPosition_FT(falconBR));
+    SmartDashboard.putNumber("FL pos", getRealPosition_FT(falconFL));
+    SmartDashboard.putNumber("BL pos", getRealPosition_FT(falconBL));
+    SmartDashboard.putNumber("Angle", gyro.getAngle());
+    SmartDashboard.putNumber("Rate", gyro.getRate());
+
+/*    SmartDashboard.putNumber("imu angle", imu.getAngle()); 
+    SmartDashboard.putNumber("imu angle X", imu.getGyroAngleX()); 
+    SmartDashboard.putNumber("imu angle Y", imu.getGyroAngleY()); 
+    SmartDashboard.putNumber("imu angle Z", imu.getGyroAngleZ()); */
+
+  }
+
+  private double getRealPosition_FT(TalonFX talon) throws IllegalArgumentException{
+    if (talon == falconBL) 
+        return Math.abs(i_falconBL - falconBL.getSelectedSensorPosition() * ((Math.PI)/2014)/10.75);
+    else if (talon == falconBR) 
+        return Math.abs(i_falconBR - falconBR.getSelectedSensorPosition() * ((Math.PI)/2014)/10.75);
+    else if (talon == falconFL) 
+        return Math.abs(i_falconFL - falconFL.getSelectedSensorPosition() * ((Math.PI)/2014)/10.75);
+    else if (talon == falconFR) 
+        return Math.abs(i_falconFR - falconFR.getSelectedSensorPosition() * ((Math.PI)/2014)/10.75);
+    else 
+        throw new IllegalArgumentException("cannot retrive encoder data from an invailid talon");
   }
 
   
@@ -168,10 +210,6 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    final double stick = _JoystickL.getRawAxis(1); //makes forward positive
-    final double stick1 = _JoystickR.getRawAxis(1) * -1; 
-    final double LT = xbox.getTriggerAxis(GenericHID.Hand.kLeft);
-    final double RT = xbox.getTriggerAxis(GenericHID.Hand.kLeft);
 
 //    final double xstick = xbox.getRawAxis(1) * -1;
 //    final double xstick1 = xbox.getRawAxis(2) * -1;
@@ -182,7 +220,6 @@ public class Robot extends TimedRobot {
   //falconFL.set(ControlMode.PercentOutput, LT);
   //falconBL.set(ControlMode.PercentOutput, LT);
   }
-
   /**
    * This function is called periodically during test mode.
    */
@@ -220,17 +257,14 @@ class AnnyDDrive extends RobotDriveBase implements Sendable, AutoCloseable {
       m_FL = FL;
       m_BL = BL;
       SendableRegistry.addChild(this, FR);
-      SendableRegistry.addChild(this, BR);
       SendableRegistry.addChild(this, FL);
+      SendableRegistry.addChild(this, BR);
       SendableRegistry.addChild(this, BL);
       m_BR.follow(FR);
       m_BL.follow(FL);
       instances++;
       SendableRegistry.addLW(this, "AnnyDDrive", instances);
   }
-
-
-
   @SuppressWarnings("PMD.AvoidThrowingNullPointerException")
   private void verify(TalonFX FR, TalonFX BR, TalonFX FL, TalonFX BL) {
       if (FR != null && BR != null && FL != null && BL != null)
@@ -304,9 +338,9 @@ class AnnyDDrive extends RobotDriveBase implements Sendable, AutoCloseable {
       }
       }
 
-      m_BL.set(ControlMode.PercentOutput, MathUtil.clamp(leftMotorOutput, -1.0, 1.0) * m_maxOutput);
+      m_FL.set(ControlMode.PercentOutput, MathUtil.clamp(leftMotorOutput, -1.0, 1.0) * m_maxOutput);
       double maxOutput = m_maxOutput * m_rightSideInvertMultiplier;
-      m_BL.set(ControlMode.PercentOutput, MathUtil.clamp(rightMotorOutput, -1.0, 1.0) * maxOutput);
+      m_FR.set(ControlMode.PercentOutput, MathUtil.clamp(rightMotorOutput, -1.0, 1.0) * maxOutput);
 
       feed();
   }
