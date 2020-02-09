@@ -7,18 +7,16 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.XboxController;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-
-import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.NetworkTable;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -28,35 +26,25 @@ import edu.wpi.first.networktables.NetworkTableInstance;
  * project.
  */
 public class Robot extends TimedRobot {
-  
+
   private static final String kDefaultAuto = "Default";
   private static final String kCustomAuto = "My Auto";
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
-  NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
-  NetworkTableEntry tx = table.getEntry("tx");
-  NetworkTableEntry ty = table.getEntry("ty");
-  NetworkTableEntry ta = table.getEntry("ta");
-  NetworkTableEntry pipe = table.getEntry("getPipe");
-  NetworkTableEntry ts = table.getEntry("ts");
-  NetworkTableEntry tv = table.getEntry("tv");
+  private final WPI_TalonSRX m_Left0 = new WPI_TalonSRX(5); // FL
+  private final WPI_TalonSRX m_Left1 = new WPI_TalonSRX(3); // BL
+  private final WPI_TalonSRX m_Right0 = new WPI_TalonSRX(5); // FR
+  private final WPI_TalonSRX m_Right1 = new WPI_TalonSRX(8); // BR
+  private SpeedControllerGroup m_LeftMotors = new SpeedControllerGroup(m_Left0, m_Left1);
+  private SpeedControllerGroup m_RightMotors = new SpeedControllerGroup(m_Right0, m_Right1);
+  private final DifferentialDrive m_Drive = new DifferentialDrive(m_LeftMotors, m_RightMotors);
 
-  double x = tx.getDouble(0.0);
-  double y = ty.getDouble(0.0);
-  //double pipe = pipe.getDouble(0.0);
-  double skew = ts.getDouble(0.0);
-  double area = ta.getDouble(0.0);
-  double target = tv.getDouble(0.0);
+  private final XboxController m_Controller = new XboxController(0);
 
-  private final WPI_TalonSRX FR = new WPI_TalonSRX(5);
-  private final WPI_TalonSRX FL = new WPI_TalonSRX(9);
-  private final WPI_TalonSRX BR = new WPI_TalonSRX(8);
-  private final WPI_TalonSRX BL = new WPI_TalonSRX(3);
-
-  private final SpeedControllerGroup SCGRight = new SpeedControllerGroup(FR, BR);
-  private final SpeedControllerGroup SCGLeft = new SpeedControllerGroup(FL, BL);
-  private final DifferentialDrive drive = new DifferentialDrive(SCGLeft, SCGRight);
+  private boolean m_LimelightHasValidTarget = false;
+  private double m_LimelightDriveCommand = 0.0;
+  private double m_LimelightSteerCommand = 0.0;
 
   /**
    * This function is run when the robot is first started up and should be
@@ -67,13 +55,6 @@ public class Robot extends TimedRobot {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
-    SmartDashboard.putNumber("LimelighX", x);
-    SmartDashboard.putNumber("LimelightY", y);
-    //SmartDashboard.putNumber("LimelightPipe", pipe);
-    SmartDashboard.putNumber("LimelightSkew", skew);
-    SmartDashboard.putNumber("LimelightArea", area);
-    SmartDashboard.putNumber("LimelightTarget", target);
-
   }
 
   /**
@@ -127,6 +108,45 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
+    NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+    NetworkTableEntry tx = table.getEntry("tx");
+    NetworkTableEntry ty = table.getEntry("ty");
+    NetworkTableEntry ta = table.getEntry("ta");
+    NetworkTableEntry ts = table.getEntry("ts");
+    NetworkTableEntry pipe = table.getEntry("getPipe");
+    NetworkTableEntry tv = table.getEntry("tv");
+
+    double x = tx.getDouble(0);
+    double y = tx.getDouble(0);
+    double area = ta.getDouble(0);
+    double KpAim = -0.1f;
+    double KpDistance = -0.1f;
+    double min_aim_command = 0.05f;
+    double left_command = 0.0f;
+    double right_command = 0.0f;
+    System.out.println("teleop");
+
+    if (m_Controller.getAButton()) {
+      System.out.println("Button A");
+      double heading_error = -x;
+      double distance_error = -y;
+      double steering_adjust = 0.0f;
+      
+      if (x > 1.0) {
+        steering_adjust = KpAim*heading_error - min_aim_command;
+      } else if (x < 1.0) {
+        steering_adjust = KpAim*heading_error + min_aim_command;
+      }
+
+      double distance_adjust = KpDistance * distance_error;
+
+      left_command += steering_adjust + distance_adjust;
+      right_command -= steering_adjust + distance_adjust;
+      m_Drive.tankDrive(left_command, right_command);
+    }
+
+
+
   }
 
   /**
