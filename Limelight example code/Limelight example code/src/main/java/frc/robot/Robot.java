@@ -119,26 +119,31 @@ public class Robot extends TimedRobot {
     }
 
     if (aim) {
+      NetworkTableEntry tx = table.getEntry("tx");
       
-      final double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
-      float heading_error = -tx;
-      float distance_error = -ty;
-      float steering_adjust = 0.0f;
-
-      if (tx > 1.0)
-      {
-              steering_adjust = KpAim*heading_error - min_aim_command;
-      }
-      else if (tx < 1.0)
-      {
-              steering_adjust = KpAim*heading_error + min_aim_command;
-      }
-
-      float distance_adjust = KpDistance * distance_error;
-
-      m_LimelightDriveCommand += steering_adjust + distance_adjust;
-      m_LimelightSteerCommand -= steering_adjust + distance_adjust;
+      System.out.println("Button A");
+      double x = tx.getDouble(0);
+      double y = tx.getDouble(0);
+      double heading_error = -x;
+      double distance_error = -y;
+      double steering_adjust = 0.0f;
+      double left_command = 0.0f;
+      double right_command = 0.0f;
+      double min_aim_command = 0.05f;
+      double KpDistance = -0.1f;
+      double KpAim = -0.1f;
       
+      if (x > 1.0) {
+        steering_adjust = KpAim*heading_error - min_aim_command;
+      } else if (x < 1.0) {
+        steering_adjust = KpAim*heading_error + min_aim_command;
+      }
+
+      double distance_adjust = KpDistance * distance_error;
+
+      left_command += steering_adjust + distance_adjust;
+      right_command -= steering_adjust + distance_adjust;
+      m_Drive.tankDrive(left_command, right_command);
     } else {
 
     }
