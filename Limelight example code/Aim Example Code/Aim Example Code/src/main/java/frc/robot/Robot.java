@@ -32,7 +32,7 @@ public class Robot extends TimedRobot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
-  private final WPI_TalonSRX m_Left0 = new WPI_TalonSRX(5); // FL
+  private final WPI_TalonSRX m_Left0 = new WPI_TalonSRX(9); // FL
   private final WPI_TalonSRX m_Left1 = new WPI_TalonSRX(3); // BL
   private final WPI_TalonSRX m_Right0 = new WPI_TalonSRX(5); // FR
   private final WPI_TalonSRX m_Right1 = new WPI_TalonSRX(8); // BR
@@ -119,9 +119,9 @@ public class Robot extends TimedRobot {
     double x = tx.getDouble(0);
     double y = tx.getDouble(0);
     double area = ta.getDouble(0);
-    double KpAim = -0.1f;
+    double KpAim = -0.1f; //tune this
     double KpDistance = -0.1f;
-    double min_aim_command = 0.05f;
+    double min_aim_command = 0.05f; //tune this was 5
     double left_command = 0.0f;
     double right_command = 0.0f;
     System.out.println("teleop");
