@@ -8,13 +8,8 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANEncoder;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.XboxController;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -24,11 +19,10 @@ import edu.wpi.first.wpilibj.XboxController;
  * project.
  */
 public class Robot extends TimedRobot {
-  private Joystick m_stick;
-  private static final int deviceID = 53; //setting CAN ID here
-  private CANSparkMax m_motor;
-  private CANEncoder m_encoder;
-
+  private static final String kDefaultAuto = "Default";
+  private static final String kCustomAuto = "My Auto";
+  private String m_autoSelected;
+  private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
   /**
    * This function is run when the robot is first started up and should be
@@ -36,11 +30,9 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-
-    m_motor = new CANSparkMax(deviceID, MotorType.kBrushless); //setting weather its a brushed or non brushed motor
-
-    m_encoder = m_motor.getEncoder();
-    m_stick = new Joystick(1);
+    m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
+    m_chooser.addOption("My Auto", kCustomAuto);
+    SmartDashboard.putData("Auto choices", m_chooser);
   }
 
   /**
@@ -68,6 +60,9 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
+    m_autoSelected = m_chooser.getSelected();
+    // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
+    System.out.println("Auto selected: " + m_autoSelected);
   }
 
   /**
@@ -75,35 +70,24 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousPeriodic() {
+    switch (m_autoSelected) {
+      case kCustomAuto:
+        // Put custom auto code here
+        break;
+      case kDefaultAuto:
+      default:
+        // Put default auto code here
+        break;
     }
-  
+  }
 
   /**
    * This function is called periodically during operator control.
    */
   @Override
   public void teleopPeriodic() {
-
-    m_motor.set(m_stick.getY());
-    /**
-     * Encoder position is read from a CANEncoder object by calling the
-     * GetPosition() method.
-     * 
-     * GetPosition() returns the position of the encoder in units of revolutions
-     */
-    SmartDashboard.putNumber("Neo Encoder Position", m_encoder.getPosition());
-
-    /**
-     * Encoder velocity is read from a CANEncoder object by calling the
-     * GetVelocity() method.
-     * 
-     * GetVelocity() returns the velocity of the encoder in units of RPM
-     */
-    SmartDashboard.putNumber("Neo Encoder Velocity", m_encoder.getVelocity());
-
-    SmartDashboard.putNumber("Neo Tempature", m_motor.getMotorTemperature());
   }
-  
+
   /**
    * This function is called periodically during test mode.
    */
