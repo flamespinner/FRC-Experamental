@@ -71,6 +71,20 @@ public class Robot extends TimedRobot {
     m_rainbowFirstPixelHue %= 180;
   }
   
+  private void blue() {
+    for (var i = 0; i < m_ledBuffer.getLength(); i++) {
+      m_ledBuffer.setRGB(i, 0, 0, 255);
+    }
+    m_led.setData(m_ledBuffer); 
+  }
+
+  private void green() {
+    for (var i = 0; i < m_ledBuffer.getLength(); i++) {
+      m_ledBuffer.setRGB(i, 57, 255, 20);
+    }
+    m_led.setData(m_ledBuffer);
+  }
+
   /**
    * This function is called every robot packet, no matter the mode. Use
    * this for items like diagnostics that you want ran during disabled,
@@ -83,6 +97,8 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
         // Fill the buffer with a rainbow
         rainbow();
+        //blue();
+        //green();
         // Set the LEDs
         m_led.setData(m_ledBuffer);
   }
