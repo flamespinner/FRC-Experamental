@@ -69,7 +69,8 @@ public final class Constants {
 
         public static final double SHOOTER_P = 1;
         public static final double SHOOTER_I = 1;
-        public static final double SHOOTER_SETPOINT = 4400; 
+        public static final double SHOOTER_SETPOINT = 5000;
+        //public static final double SHOOTER_SETPOINT = 4400; 
         public static final double SHOOTER_MAX_VELOCITY = 5676;
 
         public static final double AUTO_SHOOT_TIME = 5;
@@ -88,14 +89,6 @@ public final class Constants {
         public static final double WINCH_SPEED = -.5;
         public static final double CLIMB_SPEED = .5;
     }
-
-    /**
-     * global constants used in limelight
-     * (idk)
-     */
-    public final class LimelightConstants {
-
-    }
     
     /**
      * global constants used in user input/ output 
@@ -104,6 +97,6 @@ public final class Constants {
     public final class OIConstants {
         public static final int XBOX_ID = 0;
         public static final int HELMS_ID = 1;
-        //public static final int buttonBoard = 3; //TODO BUTTONBOARDTEST
+        public static final int BUTTONBOARD_ID = 2;
     }
 }

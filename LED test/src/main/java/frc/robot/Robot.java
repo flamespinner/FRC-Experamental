@@ -80,7 +80,7 @@ public class Robot extends TimedRobot {
 
   private void green() {
     for (var i = 0; i < m_ledBuffer.getLength(); i++) {
-      m_ledBuffer.setRGB(i, 57, 255, 20);
+      m_ledBuffer.setRGB(i, 0, 150, 50);
     }
     m_led.setData(m_ledBuffer);
   }

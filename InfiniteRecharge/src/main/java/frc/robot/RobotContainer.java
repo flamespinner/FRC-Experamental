@@ -8,14 +8,15 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-//import edu.wpi.first.wpilibj.Joystick; //TODO ButtonBoardTest
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.ArcadeDriveClassic;
+import frc.robot.commands.AutoAline;
 import frc.robot.commands.ChangeLimelightAngle;
 import frc.robot.commands.ClimberUp;
 import frc.robot.commands.ConveyorReverse;
@@ -29,6 +30,7 @@ import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.QueueSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.statusLED;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -48,7 +50,7 @@ public class RobotContainer {
   // declaring and intializing controller(s)
   private XboxController xbox = new XboxController(OIConstants.XBOX_ID);
   private XboxController helms = new XboxController(OIConstants.HELMS_ID);
-  //private Joystick buttonBoard = new Joystick(OIConstants.buttonBoard); //TODO ButtonBoardTEST
+  private Joystick buttonboard = new Joystick(OIConstants.BUTTONBOARD_ID);
 
   public static boolean shooting = false;
    
@@ -66,6 +68,7 @@ public class RobotContainer {
                               () -> xbox.getX(Hand.kRight)*.75));
     // Configure the button bindings
     configureButtonBindings();
+
   }
 
   /**
@@ -89,8 +92,12 @@ public class RobotContainer {
     new JoystickButton(helms, Button.kX.value).whenHeld(new IndexerBottomBeltRun(queueSub));
     new JoystickButton(helms, Button.kA.value).whenHeld(new ReverseQueue(queueSub));
 
-    //Button Board
-    //new JoystickButton(buttonBoard, Button).whenHeld(command); //TODO FIGURE THIS OUT (BUTTONBOARDTEST)
+
+    //Button Board Commands
+    //new JoystickButton(buttonboard, buttonboard.getRawButton(1)).whenHeld(new AutoAline(queueSub));
+    
+
+    //TODO CONTROLS
   }
 
   public XboxController getController() {
@@ -101,10 +108,9 @@ public class RobotContainer {
     return helms;
   }
 
-  //public Joystick getbuttonBoard() { //TODO BUTTONBOARDTEST
-    //return buttonBoard;
-  //}
-
+  public Joystick getButtonBoard() {
+    return buttonboard;
+  }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

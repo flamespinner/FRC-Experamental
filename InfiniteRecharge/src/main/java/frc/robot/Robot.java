@@ -19,9 +19,10 @@ import frc.robot.commands.AutoDriveToKey;
 import frc.robot.commands.AutoShootBall;
 import frc.robot.commands.IntakeBalls;
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.robot.utils.Limelight;
 import frc.robot.utils.Limelight.LightMode;
+import frc.robot.subsystems.statusLED;
+
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -60,8 +61,8 @@ public class Robot extends TimedRobot {
     autoChooser.setDefaultOption("Shœot lé bOl", autoShoot);
 
 
-    //table = NetworkTableInstance.getDefault().getTable("limelight"); //Gets Table instance
-    //table.getEntry("ledMode").setNumber(1); //sets limelight LEDS to "off"
+    //table = NetworkTableInstance.getDefault().getTable("limelight");
+    //table.getEntry("ledMode").setNumber(1);
   }
 
   /**
@@ -76,6 +77,7 @@ public class Robot extends TimedRobot {
 
     CommandScheduler.getInstance().run();
     SmartDashboard.putData("Auto Chooser", autoChooser);
+    
   }
 
   /**
@@ -83,10 +85,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void disabledInit() {
-
-    //set limelight off when robot is disabled
-    Limelight.setLedMode(LightMode.eOff); //TODO test
-    //table.getEntry("ledMode").setNumber(1);
+    //table.getEntry("ledMode").setNumber(0);
+    Limelight.setLedMode(LightMode.eOff);
   }
 
   @Override
@@ -98,10 +98,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-  
-    //set Limelight at auto start
-    Limelight.setLedMode(LightMode.eOn); //TODO test
-
+    Limelight.setLedMode(LightMode.eOn);
     m_robotContainer.driveSub.encoderReset();
 
     switch (autoChooser.getSelected().toString()) {
@@ -135,8 +132,7 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.cancel();
     }
 
-    //set Limelight leds off at start of teleop
-    Limelight.setLedMode(LightMode.eOff); //TODO test
+    Limelight.setLedMode(LightMode.eOn);
   }
 
   /**
