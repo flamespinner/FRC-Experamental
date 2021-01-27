@@ -1,0 +1,104 @@
+[
+    {
+        "callStack": "",
+        "details": "[CAN SPARK MAX] timed out while waiting for Periodic Status 1",
+        "errorCode": 2,
+        "flags": 1,
+        "location": "",
+        "messageType": 0,
+        "numOccur": 1,
+        "seqNumber": 1577,
+        "timestamp": 91.14923095703125
+    },
+    {
+        "line": "[CAN SPARK MAX] timed out while waiting for Periodic Status 1",
+        "messageType": 2,
+        "seqNumber": 1578,
+        "timestamp": 91.14984130859375
+    },
+    {
+        "callStack": "",
+        "details": "[CAN SPARK MAX] timed out while waiting for Periodic Status 1, Periodic Status 1",
+        "errorCode": 2,
+        "flags": 1,
+        "location": "",
+        "messageType": 0,
+        "numOccur": 1,
+        "seqNumber": 1579,
+        "timestamp": 91.19952392578125
+    },
+    {
+        "line": "[CAN SPARK MAX] timed out while waiting for Periodic Status 1, Periodic Status 1",
+        "messageType": 2,
+        "seqNumber": 1580,
+        "timestamp": 91.199951171875
+    },
+    {
+        "callStack": "",
+        "details": "[CAN SPARK MAX] timed out while waiting for Periodic Status 1",
+        "errorCode": 2,
+        "flags": 1,
+        "location": "",
+        "messageType": 0,
+        "numOccur": 1,
+        "seqNumber": 1581,
+        "timestamp": 92.1552734375
+    },
+    {
+        "line": "[CAN SPARK MAX] timed out while waiting for Periodic Status 1",
+        "messageType": 2,
+        "seqNumber": 1582,
+        "timestamp": 92.15618896484375
+    },
+    {
+        "callStack": "",
+        "details": "[CAN SPARK MAX] timed out while waiting for Periodic Status 1, Periodic Status 1",
+        "errorCode": 2,
+        "flags": 1,
+        "location": "",
+        "messageType": 0,
+        "numOccur": 1,
+        "seqNumber": 1583,
+        "timestamp": 92.28106689453125
+    },
+    {
+        "line": "[CAN SPARK MAX] timed out while waiting for Periodic Status 1, Periodic Status 1",
+        "messageType": 2,
+        "seqNumber": 1584,
+        "timestamp": 92.28173828125
+    },
+    {
+        "callStack": "",
+        "details": "[CAN SPARK MAX] timed out while waiting for Periodic Status 1",
+        "errorCode": 2,
+        "flags": 1,
+        "location": "",
+        "messageType": 0,
+        "numOccur": 1,
+        "seqNumber": 1585,
+        "timestamp": 93.18682861328125
+    },
+    {
+        "line": "[CAN SPARK MAX] timed out while waiting for Periodic Status 1",
+        "messageType": 2,
+        "seqNumber": 1586,
+        "timestamp": 93.1873779296875
+    },
+    {
+        "callStack": "",
+        "details": "[CAN SPARK MAX] timed out while waiting for Periodic Status 1, Periodic Status 1",
+        "errorCode": 2,
+        "flags": 1,
+        "location": "",
+        "messageType": 0,
+        "numOccur": 1,
+        "seqNumber": 1587,
+        "timestamp": 93.36346435546875
+    },
+    {
+        "line": "[CAN SPARK MAX] timed out while waiting for Periodic Status 1, Periodic Status 1",
+        "messageType": 2,
+        "seqNumber": 1588,
+        "timestamp": 93.3641357421875
+    }
+]
