@@ -34,7 +34,7 @@ public class ShooterSubsystem extends SubsystemBase {
     servo = new Servo(ShooterConstants.LIMELIGHT_SERVO_ID);
     setServo(ShooterConstants.LIMELIGHT_ANGLE_SETPOINT);
 
-    shooterMotor.setInverted(true);
+    shooterMotor.setInverted(false); //invert motor
   }
 
   @Override

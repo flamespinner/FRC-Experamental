@@ -77,13 +77,13 @@ public class RobotContainer {
   private void configureButtonBindings() {
 
     //Main's Commands - Winch is right stick, 
-    new JoystickButton(xbox, Button.kBumperRight.value).whenHeld(new StartWinch(climberSub)); //TO-DO check button ID
+    //new JoystickButton(xbox, Button.kBumperRight.value).whenHeld(new StartWinch(climberSub)); // Disabled - Climber Taken off
     new JoystickButton(xbox, Button.kA.value).whenHeld(new ShootBall(shooterSub));
     new JoystickButton(xbox, Button.kStart.value).whenHeld(new IntakeReverse(queueSub));
     new JoystickButton(xbox, Button.kX.value).toggleWhenPressed(new ChangeLimelightAngle(shooterSub));
 
     //Helm's Commands
-    new JoystickButton(helms, Button.kBack.value).whenHeld(new ClimberUp(climberSub));
+    //new JoystickButton(helms, Button.kBack.value).whenHeld(new ClimberUp(climberSub)); // Disabled - Climber Taken off
     new JoystickButton(helms, Button.kBumperLeft.value).whenHeld(new IntakeBalls(queueSub)); //TODO might be problem
     new JoystickButton(helms, Button.kB.value).whenHeld(new ConveyorReverse(queueSub));
     new JoystickButton(helms, Button.kX.value).whenHeld(new IndexerBottomBeltRun(queueSub));

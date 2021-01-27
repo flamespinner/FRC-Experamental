@@ -63,7 +63,7 @@ public final class Constants {
         public static final int SHOOTER_SPARK_ID = 53; 
         public static final int LIMELIGHT_SERVO_ID = 3;
 
-        public static final double HIGH_GOAL_SPEED = -.80;
+        public static final double HIGH_GOAL_SPEED = -.80; //Changed
         public static final int LIMELIGHT_ANGLE_SETPOINT = 57 + 90; //far shoot
         public static final int LIMELIGHT_ANGLE_SETPOINT2 = 10 + 90; //key shoot
 

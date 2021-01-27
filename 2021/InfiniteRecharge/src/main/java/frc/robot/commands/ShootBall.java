@@ -27,7 +27,7 @@ public class ShootBall extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_shootSub.setSetpoint(ShooterConstants.SHOOTER_SETPOINT);
+    //m_shootSub.setSetpoint(ShooterConstants.SHOOTER_SETPOINT);
     //m_shootSub.shootPIControl();
     RobotContainer.shooting = true;
   }
@@ -35,7 +35,8 @@ public class ShootBall extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_shootSub.shootPIControl();
+    //m_shootSub.shootPIControl();
+    m_shootSub.shootBall();
     //SmartDashboard.putNumber("Shooter Temp", m_shootSub.getMotorTemp());
   }
 
