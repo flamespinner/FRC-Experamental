@@ -5,15 +5,21 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.AnalogGyro;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.PWMVictorSPX;
+import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.SpeedControllerGroup;
+
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
- * This is a sample program to demonstrate how to use a gyro sensor to make a robot drive straight.
- * This program uses a joystick to drive forwards and backwards while the gyro is used for direction
- * keeping.
+ * This is a sample program to demonstrate how to use a gyro sensor to make a
+ * robot drive straight. This program uses a joystick to drive forwards and
+ * backwards while the gyro is used for direction keeping.
  */
 public class Robot extends TimedRobot {
   private static final double kAngleSetpoint = 0.0;
@@ -23,19 +29,30 @@ public class Robot extends TimedRobot {
   // gyro value of 360 is set to correspond to one full revolution
   private static final double kVoltsPerDegreePerSecond = 0.0128;
 
-  private static final int kLeftMotorPort = 0;
-  private static final int kRightMotorPort = 1;
-  private static final int kGyroPort = 0;
-  private static final int kJoystickPort = 0;
+  // Defining Drive Talons
+  private final WPI_TalonSRX leftFront = new WPI_TalonSRX(1); // TODO ID
+  private final WPI_TalonSRX leftBack = new WPI_TalonSRX(2); // TODO ID
+  private final WPI_TalonSRX rightFront = new WPI_TalonSRX(3); // TODO ID
+  private final WPI_TalonSRX rightBack = new WPI_TalonSRX(4); // TODO ID
 
-  private final DifferentialDrive m_myRobot =
-      new DifferentialDrive(new PWMVictorSPX(kLeftMotorPort), new PWMVictorSPX(kRightMotorPort));
+  // define speed controller groups
+  private SpeedControllerGroup leftMotors = new SpeedControllerGroup(leftFront, leftBack);
+  private SpeedControllerGroup rightMotors = new SpeedControllerGroup(rightFront, rightBack);
+
+  // define Differental Drive
+  private final DifferentialDrive drive = new DifferentialDrive(leftMotors, rightMotors);
+
+  // define Gyro Port
+  private static final int kGyroPort = 0;
+
+  // define Controller USB Port (in driver station)
+  private final XboxController xbox = new XboxController(0);
   private final AnalogGyro m_gyro = new AnalogGyro(kGyroPort);
-  private final Joystick m_joystick = new Joystick(kJoystickPort);
 
   @Override
   public void robotInit() {
     m_gyro.setSensitivity(kVoltsPerDegreePerSecond);
+    Shuffleboard.getTab("Gyro Compass").add((Sendable) m_gyro);
   }
 
   /**
@@ -46,7 +63,8 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     double turningValue = (kAngleSetpoint - m_gyro.getAngle()) * kP;
     // Invert the direction of the turn if we are going backwards
-    turningValue = Math.copySign(turningValue, m_joystick.getY());
-    m_myRobot.arcadeDrive(m_joystick.getY(), turningValue);
+    turningValue = Math.copySign(turningValue, xbox.getY());
+    drive.arcadeDrive(xbox.getY(), turningValue);
+    SmartDashboard.putNumber("Gyro Value", m_gyro.getAngle());
   }
 }
