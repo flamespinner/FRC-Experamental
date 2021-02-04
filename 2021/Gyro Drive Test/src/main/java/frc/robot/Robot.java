@@ -30,10 +30,10 @@ public class Robot extends TimedRobot {
   private static final double kVoltsPerDegreePerSecond = 0.0128;
 
   // Defining Drive Talons
-  private final WPI_TalonSRX leftFront = new WPI_TalonSRX(1); // TODO ID
-  private final WPI_TalonSRX leftBack = new WPI_TalonSRX(2); // TODO ID
+  private final WPI_TalonSRX leftFront = new WPI_TalonSRX(7); // TODO ID
+  private final WPI_TalonSRX leftBack = new WPI_TalonSRX(8); // TODO ID
   private final WPI_TalonSRX rightFront = new WPI_TalonSRX(3); // TODO ID
-  private final WPI_TalonSRX rightBack = new WPI_TalonSRX(4); // TODO ID
+  private final WPI_TalonSRX rightBack = new WPI_TalonSRX(9); // TODO ID
 
   // define speed controller groups
   private SpeedControllerGroup leftMotors = new SpeedControllerGroup(leftFront, leftBack);

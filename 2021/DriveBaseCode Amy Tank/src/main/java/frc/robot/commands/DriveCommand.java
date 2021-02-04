@@ -13,19 +13,14 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSubsystem;
 
 public class DriveCommand extends CommandBase {
-  private DriveSubsystem m_subsystem;
-  private DoubleSupplier leftDriveIntake;
-  private DoubleSupplier rightDriveIntake;
-  
+  private DriveSubsystem m_subsystem;  
   
   /**
    * Creates a new DriveCommand.
    */
-  public DriveCommand(DriveSubsystem subsystem, DoubleSupplier LDriveIntake, DoubleSupplier RDriveIntake) {
+  public DriveCommand() {
     m_subsystem = subsystem;
-    addRequirements(subsystem);
-    leftDriveIntake = LDriveIntake;
-    rightDriveIntake = RDriveIntake;
+ //   addRequirements(subsystem);
 
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -41,7 +36,6 @@ public class DriveCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_subsystem.tankDrive(leftDriveIntake.getAsDouble(), rightDriveIntake.getAsDouble());
   }
 
   // Called once the command ends or is interrupted.

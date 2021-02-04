@@ -13,6 +13,7 @@ import frc.robot.Constants.OIConstraints;
 import frc.robot.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import frc.robot.commands.DriveCommand;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -47,11 +48,9 @@ public class RobotContainer {
    * The container for the robot.  Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
-  /*m_driveSubsystem.setDefaultCommand(new DriveCommand(m_driveSubsystem, 
-                              () -> m_XboxController.getY(Hand.kLeft),
-                              () -> m_XboxController.getY(Hand.kRight)));*/
+      m_driveSubsystem.setDefaultCommand( new DriveCommand( m_driveSubsystem, m_XboxController ) )
 
-  m_driveSubsystem.tankDrive(m_XboxController.getY(Hand.kLeft), m_XboxController.getY(Hand.kRight));
+  //m_driveSubsystem.tankDrive(m_XboxController.getY(Hand.kLeft), m_XboxController.getY(Hand.kRight));
 
     // Configure the button bindings
     configureButtonBindings();
