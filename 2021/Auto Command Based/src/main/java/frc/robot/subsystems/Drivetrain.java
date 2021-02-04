@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import com.analog.adis16448.frc.ADIS16448_IMU;
-import edu.wpi.first.wpilibj2.Units;
+import edu.wpi.first.wpilibj.util.Units;
 
 
 public class Drivetrain extends SubsystemBase {
@@ -39,8 +39,8 @@ public class Drivetrain extends SubsystemBase {
 
     public DifferentialDriveWheelSpeeds getSpeeds() {
         return new DifferentialDriveWheelSpeeds(
-            leftMaster.getEncoder().getVelocity() / 10.71 * 2 * Math.PI * Units.inchesToMeters(3.0) / 60, //devided by gear ratio  -- wheel speeds meters/s
-            rightMaster.getEncoder().getVelocity() / 10.71 * 2 * Math.PI * Units.inchesToMeters(3.0) / 60 //devided by gear ratio -- wheel speeds meters/s
+            leftBack.getEncoder().getVelocity() / 10.71 * 2 * Math.PI * Units.inchesToMeters(3.0) / 60, //devided by gear ratio  -- wheel speeds meters/s
+            rightBack.getEncoder().getVelocity() / 10.71 * 2 * Math.PI * Units.inchesToMeters(3.0) / 60 //devided by gear ratio -- wheel speeds meters/s
         );
     }
 
