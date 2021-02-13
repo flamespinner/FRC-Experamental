@@ -2,12 +2,17 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.*;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.AnalogGyro;
+import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+
 import com.analog.adis16448.frc.ADIS16448_IMU;
 import edu.wpi.first.wpilibj.util.Units;
-
 
 public class Drivetrain extends SubsystemBase {
 
@@ -18,10 +23,15 @@ public class Drivetrain extends SubsystemBase {
 
     public static final ADIS16448_IMU gyro = new ADIS16448_IMU();
 
-    DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(27.0)); //Creating Kinematics object: track width of 27 inches
+    DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(27.0)); // Creating
+                                                                                                          // Kinematics
+                                                                                                          // object:
+                                                                                                          // track width
+                                                                                                          // of 27
+                                                                                                          // inches
     DifferentialDriveOdometry odometry = new DifferentialDriveOdometry(kinematics, getHeading());
 
-    SimpleMotorFeedForward feedforward = new SimpleMotorFeedForward(0.268, 1.89, 0.243);
+    SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(0.268, 1.89, 0.243);
 
     Pose2d pose;
 
@@ -39,8 +49,8 @@ public class Drivetrain extends SubsystemBase {
 
     public DifferentialDriveWheelSpeeds getSpeeds() {
         return new DifferentialDriveWheelSpeeds(
-            leftBack.getEncoder().getVelocity() / 10.71 * 2 * Math.PI * Units.inchesToMeters(3.0) / 60, //devided by gear ratio  -- wheel speeds meters/s
-            rightBack.getEncoder().getVelocity() / 10.71 * 2 * Math.PI * Units.inchesToMeters(3.0) / 60 //devided by gear ratio -- wheel speeds meters/s
+            leftBack.getPosi().getVelocity() / 10.71 * 2 * Math.PI * Units.inchesToMeters(3.0) / 60, //devided by gear ratio  -- wheel speeds meters/s
+            rightBack.getPosition().getVelocity() / 10.71 * 2 * Math.PI * Units.inchesToMeters(3.0) / 60 //devided by gear ratio -- wheel speeds meters/s
         );
     }
 
