@@ -19,7 +19,6 @@ import frc.robot.commands.AutoDriveToKey;
 import frc.robot.commands.AutoShootBall;
 import frc.robot.commands.IntakeBalls;
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.robot.utils.Limelight;
 import frc.robot.utils.Limelight.LightMode;
 
