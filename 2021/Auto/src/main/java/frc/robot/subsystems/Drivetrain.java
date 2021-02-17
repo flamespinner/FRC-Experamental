@@ -53,13 +53,13 @@ public class Drivetrain extends SubsystemBase {
 
     DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(28));
 
-    DifferentialDriveOdometry odometry = new DifferentialDriveOdometry(kinematics, getHeading()); //TODO Lookup in documentation
+    DifferentialDriveOdometry odometry = new DifferentialDriveOdometry(getHeading()); //TODO Verify this works ok
 
 
-    SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(0.045, 2.79, 0.145); //ks, kv, ka? values from the frc-characterization tool
+    SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(0.045, 2.79, 0.145); //ks, kv, ka values from the frc-characterization tool
 
     PIDController leftPidController = new PIDController(1.77, 0, 0); 
-    PIDController righPidController = new PIDController(1.77, 0, 0); 
+    PIDController rightPidController = new PIDController(1.77, 0, 0); 
     
 
 
@@ -112,7 +112,7 @@ public class Drivetrain extends SubsystemBase {
     }
 
     public PIDController getRightPIDController() { 
-        return righPidController;
+        return rightPidController;
     }
 
     public Pose2d getPose() {
@@ -136,7 +136,9 @@ public class Drivetrain extends SubsystemBase {
     
     //GyroAngle - Angle Reported from the Gyro
     //Encoder.getDistance() - Distance Travelled by the left encoder    
-    pose = odometry.update(getHeading(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance()); //TODO Figure out encoder.getDistance()
+    pose = odometry.update(getHeading(), 
+                            leftFront.getSelectedSensorVelocity() / 10.75 * 2 * Math.PI * Units.inchesToMeters(3.0) / 60, 
+                            rightFront.getSelectedSensorVelocity() / 10.75 * 2 * Math.PI * Units.inchesToMeters(3.0) / 60); //TODO VERIFY
     }
 
 }
