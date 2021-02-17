@@ -56,10 +56,10 @@ public class Drivetrain extends SubsystemBase {
     DifferentialDriveOdometry odometry = new DifferentialDriveOdometry(kinematics, getHeading()); //TODO Lookup in documentation
 
 
-    SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(.045, 2.79); //ks, kv, ka? values from the frc-characterization tool
+    SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(0.045, 2.79, 0.145); //ks, kv, ka? values from the frc-characterization tool
 
-    PIDController leftPidController = new PIDController(Kp, Ki, Kd, source, output); //TODO Put Values
-    PIDController righPidController = new PIDController(Kp, Ki, Kd, source, output) //TODO Put Values
+    PIDController leftPidController = new PIDController(1.77, 0, 0); 
+    PIDController righPidController = new PIDController(1.77, 0, 0); 
     
 
 
