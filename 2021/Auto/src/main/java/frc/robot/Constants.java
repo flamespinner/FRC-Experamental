@@ -7,6 +7,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants.  This class should not be used for any other purpose.  All constants should be
@@ -104,5 +106,12 @@ public final class Constants {
     public final class OIConstants {
         public static final int XBOX_ID = 0;
         public static final int HELMS_ID = 1;
+    }
+
+    //PATHS
+    public final class pathConstants {
+        String barrelRaceTrajectoryJSON = "paths/BarrelRace.wpilib.json";
+        
+        //https://docs.wpilib.org/en/stable/docs/software/wpilib-tools/pathweaver/integrating-robot-program.html
     }
 }

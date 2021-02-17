@@ -23,10 +23,12 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     container = new RobotContainer();
+    
   }
 
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+  }
 
   @Override //Runs once when you initialize Auto
   public void autonomousInit() {

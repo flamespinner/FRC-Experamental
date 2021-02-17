@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+/*import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 
 //TalonFX/Falcon500 Imports
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -26,7 +26,7 @@ import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.DriveConstants;*/
 
 public class Drivetrain extends SubsystemBase {
     private final WPI_TalonSRX leftFront = new WPI_TalonSRX(1);
@@ -60,9 +60,6 @@ public class Drivetrain extends SubsystemBase {
 
     PIDController leftPidController = new PIDController(1.77, 0, 0); 
     PIDController rightPidController = new PIDController(1.77, 0, 0); 
-    
-
-
 
     Pose2d pose; //contains x, y and heading position data
 
