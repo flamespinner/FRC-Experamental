@@ -119,11 +119,11 @@ public class Drivetrain extends SubsystemBase {
         return pose;
     }
 
-    public void setOutput(double leftVolts, double rightVolts) {
+    public void setOutputVolts(double leftVolts, double rightVolts) {
         //falconFR.set(leftVolts / 12);
         //falconFR.set(rightVolts / 12);
-        rightFront.set(rightVolts / 12);
         leftFront.set(leftVolts / 12);
+        rightFront.set(rightVolts / 12);
     }
 
     public void reset() {
