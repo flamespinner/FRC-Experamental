@@ -33,7 +33,7 @@
     # If doing drive test, treat this as the left side of the drivetrain
     "encoderInverted": False,
     # Only if you are doing drive (set to False if not needed)
-    "rightEncoderInverted": False,
+    "rightEncoderInverted": True,
     # ** The following is only if you are using a gyro for the DriveTrain test**
     # Gyro type (one of "NavX", "Pigeon", "ADXRS450", "AnalogGyro", or "None")
     "gyroType": "Pigeon",
@@ -45,8 +45,9 @@
     # "0" (Pigeon CAN ID or AnalogGyro channel),
     # "new WPI_TalonSRX(3)" (Pigeon on a Talon SRX),
     # "" (NavX using default SPI, ADXRS450 using onboard CS0, or no gyro)
-    "gyroPort": "15",
+    "gyroPort": "SPI.Port.kMXP",
 }
+
 
 
 

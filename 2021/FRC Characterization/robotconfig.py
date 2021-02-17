@@ -1,5 +1,6 @@
 {
     # Ports for motors
+	#meters 0.469
     # If doing drive test, treat this as the left side of the drivetrain
     "motorPorts": [43, 42],
     # Only if you are doing drive (leave empty "[]" if not)
@@ -16,7 +17,7 @@
     # If doing drive test, treat this as the left side of the drivetrain
     "motorsInverted": ["False", "False"],
     # Only if you are doing drive (leave empty "[]" if not)
-    "rightMotorsInverted": ["True", "True"],
+    "rightMotorsInverted": ["False", "False"],
     # Encoder edges-per-revolution (*NOT* cycles per revolution!)
     # For the CTRE Mag Encoder, use 16384 (4 * 4096 = 16384)
     "encoderEPR": 2048,
@@ -25,14 +26,14 @@
     # Encoder ports (leave empty "[]" if not needed)
     # Specifying encoder ports indicates you want to use Rio-side encoders
     # If doing drive test, treat this as the left side of the drivetrain
-    "encoderPorts": [43, 42],
+    "encoderPorts": [1, 2],
     # Only if you are doing drive (leave empty "[]" if not)
-    "rightEncoderPorts": [44, 41],
+    "rightEncoderPorts": [3, 4],
     # Set to True if encoders need to be inverted
     # If doing drive test, treat this as the left side of the drivetrain
     "encoderInverted": False,
     # Only if you are doing drive (set to False if not needed)
-    "rightEncoderInverted": False,
+    "rightEncoderInverted": true,
     # ** The following is only if you are using a gyro for the DriveTrain test**
     # Gyro type (one of "NavX", "Pigeon", "ADXRS450", "AnalogGyro", or "None")
     "gyroType": "NavX",
@@ -46,6 +47,7 @@
     # "" (NavX using default SPI, ADXRS450 using onboard CS0, or no gyro)
     "gyroPort": "SPI.Port.kMXP",
 }
+
 
 
 

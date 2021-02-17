@@ -24,7 +24,7 @@ public class QueueSubsystem extends SubsystemBase {
   //delcaring and intializing indexer motors
   private WPI_TalonSRX indexer1 = new WPI_TalonSRX(QueueConstants.INDEXER_RED_ID_1);
   private WPI_TalonSRX indexer2 = new WPI_TalonSRX(QueueConstants.INDEXER_RED_ID_2);
-  private WPI_TalonSRX indexerBelt = new WPI_TalonSRX(-QueueConstants.INDEXER_BOTTOM_RED_ID); //INVERTED
+  private WPI_TalonSRX indexerBelt = new WPI_TalonSRX(QueueConstants.INDEXER_BOTTOM_RED_ID);
   //delcaring and intializing conveyor motor
   private WPI_TalonSRX conveyor = new WPI_TalonSRX(QueueConstants.CONVEYOR_RED_ID_1);
 
@@ -90,7 +90,7 @@ public class QueueSubsystem extends SubsystemBase {
   public void spinIndexer(double speed) {
     indexer1.set(-speed);
     indexer2.set(-speed*.75);
-    indexerBelt.set(-speed);
+    indexerBelt.set(speed);
   }
 
   /**

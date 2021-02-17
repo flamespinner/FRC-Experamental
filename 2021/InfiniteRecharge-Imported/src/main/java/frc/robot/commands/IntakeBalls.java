@@ -33,12 +33,12 @@ public class IntakeBalls extends CommandBase {
   @Override
   public void initialize() {
     //turns on the queue
-    m_queue.spinIntake(QueueConstants.INTAKE_SPEED);
+    m_queue.spinIntake(-QueueConstants.INTAKE_SPEED); //INVERTED CORRECT
     m_queue.spinIndexer(-QueueConstants.INDEXER_SPEED);
-    m_queue.spinConveyor(-QueueConstants.CONVEYOR_SPEED);
+    m_queue.spinConveyor(QueueConstants.CONVEYOR_SPEED);
   }
 
-  // Called every time the scheduler runs while the command is scheduled.
+  // Called every time the scheduler runs while the command is scheduled.IntakeBalls
   @Override
   public void execute() {
     //contiues to take user input
