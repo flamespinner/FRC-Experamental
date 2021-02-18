@@ -23,7 +23,7 @@ public class RobotContainer {
   private Drivetrain drive = new Drivetrain();
 
   public Command getAutonomousCommand() {
-    TrajectoryConfig config = new TrajectoryConfig(
+    /*TrajectoryConfig config = new TrajectoryConfig(
         Units.feetToMeters(2.0), Units.feetToMeters(2.0));
     config.setKinematics(drive.getKinematics());
 
@@ -31,16 +31,16 @@ public class RobotContainer {
         Arrays.asList(new Pose2d(), new Pose2d(1.0, 0, new Rotation2d()),
             new Pose2d(2.3, 1.2, Rotation2d.fromDegrees(90.0))),
         config
-    );
+    );*/
     
-    /*String barrelRaceTrajectoryJSON = "paths/BarrelRace.wpilib.json";
+    String barrelRaceTrajectoryJSON = "paths/BarrelRace.wpilib.json";
     Trajectory trajectory = new Trajectory();
     try {
         Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(barrelRaceTrajectoryJSON);
         trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
     } catch (IOException ex) {
         DriverStation.reportError("Unable to open trajectory: " + barrelRaceTrajectoryJSON, ex.getStackTrace());
-    }*/
+    }
 
     RamseteCommand command = new RamseteCommand(
         trajectory,
