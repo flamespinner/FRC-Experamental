@@ -21,7 +21,7 @@ public class AutoDriveToKey extends CommandBase {
   public AutoDriveToKey(DriveSubsystem driveSub, int inversion) {
     drive = driveSub; 
     this.inversion = inversion;
-    drive.encoderReset();
+    //drive.encoderReset();
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(drive);
   }

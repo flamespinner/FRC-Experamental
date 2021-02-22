@@ -18,7 +18,23 @@ import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
+
+
+
+//Auto Imports
+import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.wpilibj.util.Units;
+import com.kauailabs.navx.frc.AHRS;
+
 /**
  * this subsystem sets up and directly manipulates everything on the drive train
  */
@@ -39,6 +55,43 @@ public class DriveSubsystem extends SubsystemBase {
 
   private double error;
   private double integral;
+
+  //define Gyro
+  AHRS gyro = new AHRS(SPI.Port.kMXP);
+
+  //DifferentialDrive Kinematics and Odometry
+  public static DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(24)); //TODO check value here
+  DifferentialDriveOdometry odometry = new DifferentialDriveOdometry(getHeading());
+
+  SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(
+    AutoConstants.ksVolts,
+    AutoConstants.kvVoltsSecondsPerMeter,
+    AutoConstants.kaVoltSecondsSquaredPerMeter
+  );
+  // kS, kV, Ka
+  //kS: Volts
+  //kV: Volts * Seconds / Meters
+  //kA: Volts * Seconds^2 / Meters
+  //"theoretical" test to check kV. 12Volts/TheoreticalFreeSpeedofDriveTrain = ~kV
+  //TheoreticalFreeSpeedofDriveTrain = free speed of the motor * wheel circumference / gear reduction
+
+
+  //Define PIDControllers
+  PIDController leftPidController = new PIDController(
+    AutoConstants.kPDriveVel,
+    0,
+    0
+  );
+  PIDController rightPidController = new PIDController(
+    AutoConstants.kPDriveVel,
+    0,
+    0
+  );
+  //PIDController(kp, ki, kd)
+
+  //Define 2D Position data x, y
+  Pose2d pose; 
+
 
   /**
    * Creates a new DriveSubsystem.
@@ -70,8 +123,21 @@ public class DriveSubsystem extends SubsystemBase {
     //Encoder Code Start
     fxConfig.primaryPID.selectedFeedbackSensor = FeedbackDevice.IntegratedSensor; //Selecting Feedback Sensor
    
-   encoderReset();
+    resetEncoders();
   }
+
+  //DifferntialDrive Speeds and such
+  public DifferentialDriveWheelSpeeds getSpeeds() {
+    return new DifferentialDriveWheelSpeeds(
+      falconFR.getSelectedSensorVelocity() / AutoConstants.gearRatio * 2 * Math.PI * Units.inchesToMeters(3.0) / 60, //RPM to meters per second
+      falconFL.getSelectedSensorVelocity() / AutoConstants.gearRatio * 2 * Math.PI * Units.inchesToMeters(3.0) / 60
+      //Velocity / 10.71(Gear Ratio) = RPM 
+      // 2 * PI * 0.0762 (Wheel size in Meters 3" Radius) = Meters Per Minute
+      //Using inches to meters to convert from an inch value (3) to meters ( 0.0762)
+      //Meters per minute / 60 = Meters per second
+    );
+  }
+
 
   public void setCoast() {
     //setting coast or brake mode, can also be done in Phoenix tuner
@@ -86,11 +152,6 @@ public class DriveSubsystem extends SubsystemBase {
     falconFL.setNeutralMode(NeutralMode.Brake);
     falconBR.setNeutralMode(NeutralMode.Brake);
     falconBL.setNeutralMode(NeutralMode.Brake);
-  }
-
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
   }
 
   private double driveTrainP() {
@@ -132,23 +193,116 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /**
+   * Returns the heading of the robot
+   * @return The Heading of the robot in degrees, from -180 to 180
+   */
+
+  public Rotation2d getHeading() {
+    return Rotation2d.fromDegrees(-gyro.getAngle());
+  }
+
+
+  /**
+   * Returns the turn rate of the robot
+   * @return The turn rate of the robot, in degrees per second
+   */
+  public double getTurnRate() {
+    return -gyro.getRate();
+  }
+
+  /**
+   * Gets the average distance of the two encoders
+   * @return the average of the two encoder readings
+   */
+  public double getAverageEncoderDistance() {
+    return (falconFR.getSelectedSensorPosition() + falconFL.getSelectedSensorPosition()) / 2.0;
+  }
+
+  /**
+   * Zeroes the heading of the robot
+   */
+  public void zeroHeading() {
+    gyro.reset();
+  }
+
+  public void resetEncoders() {
+    falconFR.setSelectedSensorPosition(0);
+    falconFL.setSelectedSensorPosition(0);
+    falconBR.setSelectedSensorPosition(0);
+    falconBL.setSelectedSensorPosition(0);  
+  }
+
+
+  /**
    * prints encoder values to the smart dashboard
    */
   public void printEncoderValues() {
     SmartDashboard.putNumber("FR pos", falconFR.getSelectedSensorPosition());
-    SmartDashboard.putNumber("BR pos", falconBR.getSelectedSensorPosition());
+    //SmartDashboard.putNumber("BR pos", falconBR.getSelectedSensorPosition());
     SmartDashboard.putNumber("FL pos", falconFL.getSelectedSensorPosition());
-    SmartDashboard.putNumber("BL pos", falconBL.getSelectedSensorPosition());
+    //SmartDashboard.putNumber("BL pos", falconBL.getSelectedSensorPosition());
+    SmartDashboard.putNumber("FL vol", falconFL.getSelectedSensorVelocity());
+    SmartDashboard.putNumber("FR Vol", falconFR.getSelectedSensorVelocity());
+    SmartDashboard.putNumber("Angle", gyro.getAngle());
+    SmartDashboard.putNumber("Pose X", odometry.getPoseMeters().getTranslation().getX());
+    SmartDashboard.putNumber("Pose Y", odometry.getPoseMeters().getTranslation().getY());
+    SmartDashboard.putNumber("Pose Rotation", odometry.getPoseMeters().getRotation().getDegrees());
   }
 
   public double getAvgPosition() {
     return (falconFR.getSelectedSensorPosition() + falconBR.getSelectedSensorPosition()) / 2;
   }
 
-  public void encoderReset() {
-    falconFR.setSelectedSensorPosition(0);
-    falconFL.setSelectedSensorPosition(0);
-    falconBR.setSelectedSensorPosition(0);
-    falconBL.setSelectedSensorPosition(0);
+  //Returns
+  public SimpleMotorFeedforward getFeedForward() {
+    return feedforward;
   }
+
+  public DifferentialDriveKinematics getKinematics() {
+    return kinematics;
+  }
+
+  public PIDController getLeftPidController() {
+    return leftPidController;
+  }
+
+  public PIDController getRightPidController() {
+    return rightPidController;
+  }
+
+  public Pose2d getPose() {
+    return pose;
+  }
+
+  /**
+   * Controls the left and right sides of the drive directly with voltages
+   * @param leftVolts the commanded left output
+   * @param rightVolts the commanded right output
+   */
+  public void setOutputVolts(double leftVolts, double rightVolts) {
+    falconFR.setVoltage(leftVolts / 12);
+    falconFL.setVoltage(leftVolts / 12);
+    //drive.feed();
+  } 
+
+  /**
+   * Resets the odometry to the specified pose.
+   * 
+   * @param pose The pose to which to set the odometry
+   */
+  public void resetOdometry(Pose2d pose) {
+    resetEncoders();
+    odometry.resetPosition(pose, getHeading());
+  }
+
+  @Override
+  public void periodic() {
+
+    pose = odometry.update(
+      getHeading(), 
+      falconFL.getSelectedSensorPosition() / 10.71 * 2 * Math.PI * Units.inchesToMeters(3.0) / 60, 
+      falconFR.getSelectedSensorPosition() / 10.71 * 2 * Math.PI * Units.inchesToMeters(3.0) / 60); //TODO FIX ME
+    printEncoderValues();
+  }
+
 }
