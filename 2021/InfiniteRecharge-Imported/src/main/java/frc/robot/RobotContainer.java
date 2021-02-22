@@ -7,8 +7,12 @@
 
 package frc.robot;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 //import edu.wpi.first.wpilibj.Joystick; //TODO ButtonBoardTest
@@ -21,6 +25,7 @@ import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
@@ -143,7 +148,8 @@ public class RobotContainer {
 
     //An example trajectory to follow. All units in Meters.
     //This is where you would import the Pathweaver Path
-    Trajectory exameTrajectory = TrajectoryGenerator.generateTrajectory(
+
+    /*Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
         // Start at the origin facing the +X Direction
         new Pose2d(0, 0, new Rotation2d(0)), 
         //Pass through these two interior waypoints, making an 's' curve path
@@ -156,9 +162,20 @@ public class RobotContainer {
         // Pass Config
         config
     );
+*/
+
+    String trajectoryJSON = "paths/BarrelRacing.wpilib.json";
+    Trajectory trajectory = new Trajectory();
+    try {
+        Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
+        trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+    } catch (IOException ex) {
+        DriverStation.reportError("Unable to open trajectory: " + trajectoryJSON, ex.getStackTrace());
+    }
 
     RamseteCommand ramseteCommand = new RamseteCommand(
-        exameTrajectory, 
+        //exampleTrajectory, //trajectory
+        trajectory,
         driveSub::getPose, 
         new RamseteController(AutoConstants.kRamseteB, AutoConstants.kRamseteZeta), 
         driveSub.getFeedForward(),
@@ -171,7 +188,8 @@ public class RobotContainer {
     );
 
     //Reset odometry to the starting pose of the trajectory.
-    driveSub.resetOdometry(exameTrajectory.getInitialPose());
+    //driveSub.resetOdometry(exampleTrajectory.getInitialPose());
+    driveSub.resetOdometry(trajectory.getInitialPose());
 
     //Run path following command, then stop at the end.
     return ramseteCommand.andThen(() -> driveSub.setOutputVolts(0, 0));
