@@ -89,7 +89,7 @@ public class Drivetrain extends SubsystemBase {
             //falconFR.getSelectedSensorVelocity() / 10.75 * 2 * Math.PI * Units.inchesToMeters(3.0) / 60,
             //falconFL.getSelectedSensorVelocity() / 10.75 * 2 * Math.PI * Units.inchesToMeters(3.0) / 60
 
-            falconFR.getSelectedSensorVelocity() / 10.75 * 2 * Math.PI * Units.inchesToMeters(3.0) / 60, 
+            falconFL.getSelectedSensorVelocity() / 10.75 * 2 * Math.PI * Units.inchesToMeters(3.0) / 60, 
             falconFR.getSelectedSensorVelocity() / 10.75 * 2 * Math.PI * Units.inchesToMeters(3.0) / 60
 
         );
