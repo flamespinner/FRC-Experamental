@@ -36,22 +36,22 @@ public final class Constants {
     }
 
     public final class AutoConstants {
-        public static final double ksVolts = 0.528;
-        public static final double kvVoltsSecondsPerMeter = 2.7;
-        public static final double kaVoltSecondsSquaredPerMeter = 0.153;
+        public static final double ksVolts = 0.574;
+        public static final double kvVoltsSecondsPerMeter = 2.64;
+        public static final double kaVoltSecondsSquaredPerMeter = 0.995;
 
-        public static final double kPDriveVel = 1.85;
-        //public static final double kTrackwidthMeters = 1.36;
+        public static final double kPDriveVel = 2.39;
+        public static final double kTrackwidthMeters = 1.3439451096363204;
         //public static final DifferentialDriveKinematics kDriveKinematics =
             //new DifferentialDriveKinematics(kTrackwidthMeters);
         
         public static final double kMaxSpeedMetersPerSecond = 3;
         public static final double kMaxAccelerationMetersPerSecondSquared = 3;
 
-        public static final double kRamseteB = 2;
-        public static final double kRamseteZeta = 0.7;
+        public static final double kRamseteB = 2; //This should be good for most robots
+        public static final double kRamseteZeta = 0.7; //This should be good for most robots
 
-        public static final double gearRatio = 10.71;
+        public static final double gearRatio = 10.71; //This shouldn't change
     }
 
     /**

@@ -14,8 +14,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.commands.AutoCross;
-import frc.robot.commands.AutoDriveToKey;
 import frc.robot.commands.AutoShootBall;
 import frc.robot.commands.IntakeBalls;
 import edu.wpi.first.networktables.NetworkTable;
@@ -35,8 +33,6 @@ public class Robot extends TimedRobot {
   NetworkTable table;
   private SendableChooser<Command> autoChooser = new SendableChooser<>();
   
-  private AutoCross autoCross;
-  private SequentialCommandGroup autoShoot;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -47,7 +43,7 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     m_robotContainer = new RobotContainer();
 
-    autoCross = new AutoCross(m_robotContainer.driveSub); //TODO test 
+   /* autoCross = new AutoCross(m_robotContainer.driveSub); //TODO test 
     autoShoot = new SequentialCommandGroup(new AutoDriveToKey(m_robotContainer.driveSub, 1), 
                                            new ParallelRaceGroup(
                                                new AutoShootBall(m_robotContainer.shooterSub), 
@@ -56,7 +52,7 @@ public class Robot extends TimedRobot {
     autoChooser.addOption("dO Nøthîng", null);
     autoChooser.addOption("Shœot lé bOl", autoShoot);
     autoChooser.addOption("cR√os lînë", autoCross);
-    autoChooser.setDefaultOption("Shœot lé bOl", autoShoot);
+    autoChooser.setDefaultOption("Shœot lé bOl", autoShoot); */
 
 
     //table = NetworkTableInstance.getDefault().getTable("limelight"); //Gets Table instance
@@ -74,7 +70,6 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
 
     CommandScheduler.getInstance().run();
-    SmartDashboard.putData("Auto Chooser", autoChooser);
   }
 
   /**
@@ -90,6 +85,12 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
+  }
+
+  @Override
+  public void autonomousInit() {
+    m_robotContainer.reset();
+    m_robotContainer.getAutonomousCommand().schedule();
   }
 
   /**
@@ -121,7 +122,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousPeriodic() {
-    
+    CommandScheduler.getInstance().run();
   }
 
   @Override
@@ -132,6 +133,7 @@ public class Robot extends TimedRobot {
     // this line or comment it out.
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
+    m_robotContainer.reset();
     }
 
     //set Limelight leds off at start of teleop

@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 
@@ -60,7 +61,8 @@ public class DriveSubsystem extends SubsystemBase {
   AHRS gyro = new AHRS(SPI.Port.kMXP);
 
   //DifferentialDrive Kinematics and Odometry
-  public static DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(24)); //TODO check value here
+  //public static DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(24)); //TODO check value here
+  public static DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(AutoConstants.kTrackwidthMeters);
   DifferentialDriveOdometry odometry = new DifferentialDriveOdometry(getHeading());
 
   SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(
@@ -115,11 +117,11 @@ public class DriveSubsystem extends SubsystemBase {
     falconBR.follow(falconFR); //talonBR follows TalonFR
     falconBL.follow(falconFL); //talonBL follows TalonFR 
 
-    //falconFR.setInverted(true); //set to invert falconFR.. CW/CCW.. Green = forward (motor led)
+    falconFR.setInverted(true); //set to invert falconFR.. CW/CCW.. Green = forward (motor led)
     falconBR.setInverted(InvertType.FollowMaster); //matches whatever falconFR is
 
     //falconFL.setInverted(true); //set to invert falconFL.. CW/CCW.. Green = foward (motor led)
-    falconBL.setInverted(InvertType.FollowMaster); //matches whatever falcon FL is
+    //falconBL.setInverted(InvertType.FollowMaster); //matches whatever falcon FL is
     //Encoder Code Start
     fxConfig.primaryPID.selectedFeedbackSensor = FeedbackDevice.IntegratedSensor; //Selecting Feedback Sensor
    
@@ -293,6 +295,10 @@ public class DriveSubsystem extends SubsystemBase {
   public void resetOdometry(Pose2d pose) {
     resetEncoders();
     odometry.resetPosition(pose, getHeading());
+  }
+
+  public void reset() {
+    odometry.resetPosition(new Pose2d(), getHeading());
   }
 
   @Override

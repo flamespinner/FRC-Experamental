@@ -149,7 +149,7 @@ public class RobotContainer {
     //An example trajectory to follow. All units in Meters.
     //This is where you would import the Pathweaver Path
 
-    /*Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
+    Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
         // Start at the origin facing the +X Direction
         new Pose2d(0, 0, new Rotation2d(0)), 
         //Pass through these two interior waypoints, making an 's' curve path
@@ -162,20 +162,20 @@ public class RobotContainer {
         // Pass Config
         config
     );
-*/
 
-    String trajectoryJSON = "paths/BarrelRacing.wpilib.json";
+
+    /*String trajectoryJSON = "paths/BarrelRacing.wpilib.json";
     Trajectory trajectory = new Trajectory();
     try {
         Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
         trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
     } catch (IOException ex) {
         DriverStation.reportError("Unable to open trajectory: " + trajectoryJSON, ex.getStackTrace());
-    }
+    }*/
 
     RamseteCommand ramseteCommand = new RamseteCommand(
-        //exampleTrajectory, //trajectory
-        trajectory,
+        exampleTrajectory, //trajectory
+        //trajectory,
         driveSub::getPose, 
         new RamseteController(AutoConstants.kRamseteB, AutoConstants.kRamseteZeta), 
         driveSub.getFeedForward(),
@@ -188,10 +188,14 @@ public class RobotContainer {
     );
 
     //Reset odometry to the starting pose of the trajectory.
-    //driveSub.resetOdometry(exampleTrajectory.getInitialPose());
-    driveSub.resetOdometry(trajectory.getInitialPose());
+    driveSub.resetOdometry(exampleTrajectory.getInitialPose());
+    //driveSub.resetOdometry(trajectory.getInitialPose());
 
     //Run path following command, then stop at the end.
     return ramseteCommand.andThen(() -> driveSub.setOutputVolts(0, 0));
+  }
+
+  public void reset() {
+    driveSub.reset();
   }
 }

@@ -37,6 +37,24 @@ public final class Constants {
         public static final double DRIVE_I = 1;
     }
 
+    public final class AutoConstants {
+        public static final double ksVolts = 0.045;
+        public static final double kvVoltsSecondsPerMeter = 2.79;
+        public static final double kaVoltSecondsSquaredPerMeter = 0.145;
+
+        public static final double kPDriveVel = 1.77;
+        public static final double kTrackwidthMeters = 1.3439451096363204;
+        //public static final DifferentialDriveKinematics kDriveKinematics =
+            //new DifferentialDriveKinematics(kTrackwidthMeters);
+        
+        public static final double kMaxSpeedMetersPerSecond = 3;
+        public static final double kMaxAccelerationMetersPerSecondSquared = 3;
+
+        public static final double kRamseteB = 2;
+        public static final double kRamseteZeta = 0.7;
+
+        public static final double gearRatio = 10.71;
+    }
     /**
      * global constants used in the queue (intake, indexer, conveyor)
      * (motor controller ids, speeds, etc.) 
