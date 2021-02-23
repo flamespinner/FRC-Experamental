@@ -223,17 +223,6 @@ public class DriveSubsystem extends SubsystemBase {
         return Kinematics;
     }
 
-   /**
-   * sets the speed of the drive train with arcade controls
-   * @param xSpeed
-   * @param zRotation
-   */
-  public void setDriveSpeed_Arcade(double xSpeed, double zRotation) {
-    if (zRotation == 0 )
-      driveStraight(xSpeed);
-    drive.arcadeDrive(xSpeed, zRotation);
-  }
-
   /**
    * set the speed of the drive train with tank controls (WIP)
    * @param lSpeed
@@ -241,6 +230,17 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public void setDriveSpeed_Tank(double lSpeed, double rSpeed) {
     drive.tankDrive(lSpeed, rSpeed);
+  }
+
+/**
+ * sets the speed of the drive train with arcade controls
+ * @param xSpeed
+ * @param zRotation
+ */
+  public void setDriveSpeed_Arcade(double xSpeed, double zRotation) {
+    if (zRotation == 0 )
+        driveStraight(xSpeed);
+    drive.arcadeDrive(xSpeed, zRotation);
   }
 
   private double driveTrainP() {
