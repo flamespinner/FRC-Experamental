@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.commands.AutoShootBall;
 import frc.robot.commands.IntakeBalls;
 import edu.wpi.first.networktables.NetworkTable;
 import frc.robot.utils.Limelight;
@@ -89,8 +88,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    m_robotContainer.reset();
-    m_robotContainer.getAutonomousCommand().schedule();
+    //m_robotContainer.reset(); //TODO FIX
+    //m_robotContainer.getAutonomousCommand().schedule(); //TODO FIX
   }
 
   /**
@@ -133,7 +132,7 @@ public class Robot extends TimedRobot {
     // this line or comment it out.
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
-    m_robotContainer.reset();
+    //m_robotContainer.reset(); //TODO FIX
     }
 
     //set Limelight leds off at start of teleop

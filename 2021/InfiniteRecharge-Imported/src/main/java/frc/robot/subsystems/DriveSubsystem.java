@@ -1,172 +1,229 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
-
 package frc.robot.subsystems;
 
+//Motor Imports
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
-import edu.wpi.first.wpilibj.SpeedControllerGroup;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.Constants.AutoConstants;
-import frc.robot.Constants.DriveConstants;
-
-
-
-//Auto Imports
-import edu.wpi.first.wpilibj.controller.PIDController;
-import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
+//Sensor Imports
+import com.kauailabs.navx.frc.AHRS;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
+
+//Auto Imports
+import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.SpeedControllerGroup;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
+
+//Util Imports
 import edu.wpi.first.wpilibj.util.Units;
-import com.kauailabs.navx.frc.AHRS;
+import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.DriveConstants;
+
 
 /**
  * this subsystem sets up and directly manipulates everything on the drive train
  */
 public class DriveSubsystem extends SubsystemBase {
+    
+    //Declare and intializing Falcon500s
+    //Left Drive Train Motors
+    private final WPI_TalonFX falconFL = new WPI_TalonFX(DriveConstants.FALCON_FL_ID);
+    private final WPI_TalonFX falconBL = new WPI_TalonFX(DriveConstants.FALCON_BL_ID);
 
-  //declaring and intializing drive motor controllers and assciated configuration objects
-  private final WPI_TalonFX falconBL = new WPI_TalonFX(DriveConstants.FALCON_BL_ID); 
-  private final WPI_TalonFX falconFL = new WPI_TalonFX(DriveConstants.FALCON_FL_ID); 
-  private final WPI_TalonFX falconBR = new WPI_TalonFX(DriveConstants.FALCON_BR_ID); 
-  private final WPI_TalonFX falconFR = new WPI_TalonFX(DriveConstants.FALCON_FR_ID); 
+    //Right Drive train Motors
+    private final WPI_TalonFX falconFR = new WPI_TalonFX(DriveConstants.FALCON_FR_ID);
+    private final WPI_TalonFX falconBR = new WPI_TalonFX(DriveConstants.FALCON_BR_ID);
 
-  private final TalonFXConfiguration fxConfig = new TalonFXConfiguration();
+    DifferentialDriveKinematics Kinematics =
+            new DifferentialDriveKinematics(AutoConstants.kTrackwidthMeters);
 
-  private final SpeedControllerGroup SCG_R = new SpeedControllerGroup(falconFR, falconBR); 
-  private final SpeedControllerGroup SCG_L = new SpeedControllerGroup(falconFL, falconBL); 
+    //Creating Speed Controller Groups
+    //Motors on the right side of the drive
+    private final SpeedControllerGroup SCG_R = new SpeedControllerGroup(falconFR, falconBR);
 
-  private final DifferentialDrive drive = new DifferentialDrive(SCG_L, SCG_R);
+    //Motors on the left side of the drive
+    private final SpeedControllerGroup SCG_L = new SpeedControllerGroup(falconFL, falconBL);
 
-  private double error;
-  private double integral;
+    //The Robots Drive
+    private final DifferentialDrive drive = new DifferentialDrive(SCG_L, SCG_R);
 
-  //define Gyro
-  AHRS gyro = new AHRS(SPI.Port.kMXP);
+    //Define new Navx Gyro on MXP
+    AHRS gyro = new AHRS(SPI.Port.kMXP);
 
-  //DifferentialDrive Kinematics and Odometry
-  //public static DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(24)); //TODO check value here
-  public static DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(AutoConstants.kTrackwidthMeters);
-  DifferentialDriveOdometry odometry = new DifferentialDriveOdometry(getHeading());
+    //Odometry class for tracking robot pose
+   private final DifferentialDriveOdometry odometry;
 
-  SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(
-    AutoConstants.ksVolts,
-    AutoConstants.kvVoltsSecondsPerMeter,
-    AutoConstants.kaVoltSecondsSquaredPerMeter
-  );
-  // kS, kV, Ka
-  //kS: Volts
-  //kV: Volts * Seconds / Meters
-  //kA: Volts * Seconds^2 / Meters
-  //"theoretical" test to check kV. 12Volts/TheoreticalFreeSpeedofDriveTrain = ~kV
-  //TheoreticalFreeSpeedofDriveTrain = free speed of the motor * wheel circumference / gear reduction
-
-
-  //Define PIDControllers
-  PIDController leftPidController = new PIDController(
-    AutoConstants.kPDriveVel,
-    0,
-    0
-  );
-  PIDController rightPidController = new PIDController(
-    AutoConstants.kPDriveVel,
-    0,
-    0
-  );
-  //PIDController(kp, ki, kd)
-
-  //Define 2D Position data x, y
-  Pose2d pose; 
-
-
-  /**
-   * Creates a new DriveSubsystem.
-   */
-  public DriveSubsystem() {
-    setBrake();
-    //setting ramp
-    falconFR.configOpenloopRamp(1.0); // 0.5 seconds from neutral to full output (during open-loop control)
-    falconFR.configClosedloopRamp(0); // 0 disables ramping (during closed-loop control)
-
-    falconFL.configOpenloopRamp(1.0); // 0.5 seconds from neutral to full output (during open-loop control)
-    falconFL.configClosedloopRamp(0); // 0 disables ramping (during closed-loop control)
-
-    falconBL.configOpenloopRamp(1.0); // 0.5 seconds from neutral to full output (during open-loop control)
-    falconBL.configClosedloopRamp(0); // 0 disables ramping (during closed-loop control)
-
-    falconBR.configOpenloopRamp(1.0); // 0.5 seconds from neutral to full output (during open-loop control)
-    falconBR.configClosedloopRamp(0); // 0 disables ramping (during closed-loop control)
-
-    //Drive Base Code
-    falconBR.follow(falconFR); //talonBR follows TalonFR
-    falconBL.follow(falconFL); //talonBL follows TalonFR 
-
-    falconFR.setInverted(true); //set to invert falconFR.. CW/CCW.. Green = forward (motor led)
-    falconBR.setInverted(InvertType.FollowMaster); //matches whatever falconFR is
-
-    //falconFL.setInverted(true); //set to invert falconFL.. CW/CCW.. Green = foward (motor led)
-    //falconBL.setInverted(InvertType.FollowMaster); //matches whatever falcon FL is
-    //Encoder Code Start
-    fxConfig.primaryPID.selectedFeedbackSensor = FeedbackDevice.IntegratedSensor; //Selecting Feedback Sensor
+   private double error;
    
-    resetEncoders();
-  }
 
-  //DifferntialDrive Speeds and such
-  public DifferentialDriveWheelSpeeds getSpeeds() {
-    return new DifferentialDriveWheelSpeeds(
-      falconFR.getSelectedSensorVelocity() / AutoConstants.gearRatio * 2 * Math.PI * Units.inchesToMeters(3.0) / 60, //RPM to meters per second
-      falconFL.getSelectedSensorVelocity() / AutoConstants.gearRatio * 2 * Math.PI * Units.inchesToMeters(3.0) / 60
-      //Velocity / 10.71(Gear Ratio) = RPM 
-      // 2 * PI * 0.0762 (Wheel size in Meters 3" Radius) = Meters Per Minute
-      //Using inches to meters to convert from an inch value (3) to meters ( 0.0762)
-      //Meters per minute / 60 = Meters per second
-    );
-  }
+    /**
+     * Creates a new DriveSubsystem
+     */
+    public DriveSubsystem() {
+        setBrake();
+        resetEncoders();
+        odometry = new DifferentialDriveOdometry(gyro.getRotation2d());
 
+        //set followers
+        falconBR.follow(falconFR);
+        falconBL.follow(falconFL);
+    }
 
-  public void setCoast() {
-    //setting coast or brake mode, can also be done in Phoenix tuner
-    falconFR.setNeutralMode(NeutralMode.Coast);
-    falconFL.setNeutralMode(NeutralMode.Coast);
-    falconBR.setNeutralMode(NeutralMode.Coast);
-    falconBL.setNeutralMode(NeutralMode.Coast);
-  }
-  public void setBrake() {
-    //setting coast or brake mode, can also be done in Phoenix tuner
-    falconFR.setNeutralMode(NeutralMode.Brake);
-    falconFL.setNeutralMode(NeutralMode.Brake);
-    falconBR.setNeutralMode(NeutralMode.Brake);
-    falconBL.setNeutralMode(NeutralMode.Brake);
-  }
+    /**
+     * Sets the Falcon500s to break mode.
+     */
+    public void setBrake() {
+        falconBL.setNeutralMode(NeutralMode.Brake);
+        falconFL.setNeutralMode(NeutralMode.Brake);
+        falconBR.setNeutralMode(NeutralMode.Brake);
+        falconFR.setNeutralMode(NeutralMode.Brake);
+    }
 
-  private double driveTrainP() {
-    error = falconFL.getSelectedSensorPosition() - falconFR.getSelectedSensorPosition();
-    //integral += error*.02;
-    return DriveConstants.DRIVE_P*error;
-  }
+    @Override
+    public void periodic() {
+        //Update the odometry in the periodic block
+        odometry.update(gyro.getRotation2d(), falconFL.getSelectedSensorPosition(), falconFR.getSelectedSensorPosition());
+    }
 
-  public void driveStraight(double xSpeed) {
-    drive.arcadeDrive(xSpeed, -driveTrainP());
-  }
+    /**
+     * Returns the currently-estimated pose of the robot
+     * 
+     * @return The Pose
+     */
+    public Pose2d getPose() {
+        return odometry.getPoseMeters();
+    }
 
-  /**
+    /**
+     * Returns the current wheel speeds of the robot
+     * 
+     * @return The Current wheel speeds
+     */
+    public DifferentialDriveWheelSpeeds getWheelSpeeds() {
+        return new DifferentialDriveWheelSpeeds(falconFL.getSelectedSensorVelocity() / 10.71 * 2 * Units.inchesToMeters(3.0) / 60, falconFR.getSelectedSensorVelocity() / 10.71 *2 * Units.inchesToMeters(3) / 60);
+    }
+
+    /**
+     * Resets the odometry to the specified pose
+     * 
+     * @param pose The pose to which to set the odometry.
+     */
+    public void resetOdeometry(Pose2d pose) {
+        resetEncoders();
+        odometry.resetPosition(pose, gyro.getRotation2d());
+    }
+
+    /**
+     * Drives the robot using arcade controls
+     * 
+     * @param fwd the command forward movement
+     * @param rot the commanded rotation
+     */
+    public void arcadeDrive(double fwd, double rot) { //TODO Change
+        drive.arcadeDrive(fwd, rot);
+    }
+
+    /**
+     * Controls the left and right sides of the drive directly with voltages
+     * 
+     * @param leftVolts the commanded left output
+     * @param rightVolts the commanded right output
+     */
+    public void tankDriveVolts(double leftVolts, double rightVolts) {
+        SCG_L.setVoltage(leftVolts);
+        SCG_R.setVoltage(rightVolts);
+        drive.feed();
+    }
+    
+    /**
+     * Resets the drive encoders to currently read a position of 0.
+     */
+     public void resetEncoders() {
+        falconFR.setSelectedSensorPosition(0);
+        falconFL.setSelectedSensorPosition(0);
+        falconBR.setSelectedSensorPosition(0);
+        falconBL.setSelectedSensorPosition(0);
+    }
+
+    /**
+    * Gets the average distance of the two encoders
+    *
+    *@return the average of the two encoder readings
+    */
+    public double getAverageEncoderDistance() {
+        return (falconFL.getSelectedSensorPosition() + falconFR.getSelectedSensorPosition()) / 2.0; //TODO VERIFY
+    }
+
+    /**
+     * Gets the left drive encoder
+     * 
+     * @return the left drive encoder
+     */
+    /*public Encoder getLeftEncoder() { //TODO FIX
+        return leftEncoder;
+    }*/
+
+    /**
+     * Gets the right drive encoder
+     * 
+     * @return the right drive encoder
+     */
+    /*public Encoder getRightEncoder() {
+        return rightEncoder;
+    }*/
+
+    /**
+     * Sets the max output of the drive. Useful for scaling the drive to drive more slowly.
+     * 
+     * @param maxOutput the maximum output to which the drive will be constrained
+     */
+    public void setMaxOutput(double maxOutput) {
+        drive.setMaxOutput(maxOutput);
+    }
+
+    /**
+     * Zeroes the heading of the robot.
+     */
+    public void zeroHeading() {
+        gyro.reset();
+    }
+
+    /**
+     * Returns the heading of the robot
+     * 
+     * @return the robot's heading in degrees, from -180 to 180
+     */
+    public double getHeading() {
+        return gyro.getRotation2d().getDegrees();
+    }
+
+    /**
+     * Returns the turn rate of the robot
+     * 
+     * @return the turn rate of the robot, in degrees per second
+     */
+    public double getTurnRate() {
+        return -gyro.getRate();
+    }
+
+    /**
+     * Returns Kinematics
+     * 
+     * @return the robots Kinematics
+     */
+    public DifferentialDriveKinematics getKinematics() {
+        return Kinematics;
+    }
+
+   /**
    * sets the speed of the drive train with arcade controls
    * @param xSpeed
    * @param zRotation
@@ -186,129 +243,14 @@ public class DriveSubsystem extends SubsystemBase {
     drive.tankDrive(lSpeed, rSpeed);
   }
 
-  /**
-   * stops the drive train
-   */
-  public void stopRobot() {
-    falconFR.set(ControlMode.PercentOutput, 0);
-    falconFL.set(ControlMode.PercentOutput, 0);
+  private double driveTrainP() {
+    error = falconFL.getSelectedSensorPosition() - falconFR.getSelectedSensorPosition();
+    //integral += error*.02;
+    return DriveConstants.DRIVE_P*error;
   }
 
-  /**
-   * Returns the heading of the robot
-   * @return The Heading of the robot in degrees, from -180 to 180
-   */
-
-  public Rotation2d getHeading() {
-    return Rotation2d.fromDegrees(-gyro.getAngle());
-  }
-
-
-  /**
-   * Returns the turn rate of the robot
-   * @return The turn rate of the robot, in degrees per second
-   */
-  public double getTurnRate() {
-    return -gyro.getRate();
-  }
-
-  /**
-   * Gets the average distance of the two encoders
-   * @return the average of the two encoder readings
-   */
-  public double getAverageEncoderDistance() {
-    return (falconFR.getSelectedSensorPosition() + falconFL.getSelectedSensorPosition()) / 2.0;
-  }
-
-  /**
-   * Zeroes the heading of the robot
-   */
-  public void zeroHeading() {
-    gyro.reset();
-  }
-
-  public void resetEncoders() {
-    falconFR.setSelectedSensorPosition(0);
-    falconFL.setSelectedSensorPosition(0);
-    falconBR.setSelectedSensorPosition(0);
-    falconBL.setSelectedSensorPosition(0);  
-  }
-
-
-  /**
-   * prints encoder values to the smart dashboard
-   */
-  public void printEncoderValues() {
-    SmartDashboard.putNumber("FR pos", falconFR.getSelectedSensorPosition());
-    //SmartDashboard.putNumber("BR pos", falconBR.getSelectedSensorPosition());
-    SmartDashboard.putNumber("FL pos", falconFL.getSelectedSensorPosition());
-    //SmartDashboard.putNumber("BL pos", falconBL.getSelectedSensorPosition());
-    SmartDashboard.putNumber("FL vol", falconFL.getSelectedSensorVelocity());
-    SmartDashboard.putNumber("FR Vol", falconFR.getSelectedSensorVelocity());
-    SmartDashboard.putNumber("Angle", gyro.getAngle());
-    SmartDashboard.putNumber("Pose X", odometry.getPoseMeters().getTranslation().getX());
-    SmartDashboard.putNumber("Pose Y", odometry.getPoseMeters().getTranslation().getY());
-    SmartDashboard.putNumber("Pose Rotation", odometry.getPoseMeters().getRotation().getDegrees());
-  }
-
-  public double getAvgPosition() {
-    return (falconFR.getSelectedSensorPosition() + falconBR.getSelectedSensorPosition()) / 2;
-  }
-
-  //Returns
-  public SimpleMotorFeedforward getFeedForward() {
-    return feedforward;
-  }
-
-  public DifferentialDriveKinematics getKinematics() {
-    return kinematics;
-  }
-
-  public PIDController getLeftPidController() {
-    return leftPidController;
-  }
-
-  public PIDController getRightPidController() {
-    return rightPidController;
-  }
-
-  public Pose2d getPose() {
-    return pose;
-  }
-
-  /**
-   * Controls the left and right sides of the drive directly with voltages
-   * @param leftVolts the commanded left output
-   * @param rightVolts the commanded right output
-   */
-  public void setOutputVolts(double leftVolts, double rightVolts) {
-    falconFR.setVoltage(leftVolts / 12);
-    falconFL.setVoltage(leftVolts / 12);
-    //drive.feed();
-  } 
-
-  /**
-   * Resets the odometry to the specified pose.
-   * 
-   * @param pose The pose to which to set the odometry
-   */
-  public void resetOdometry(Pose2d pose) {
-    resetEncoders();
-    odometry.resetPosition(pose, getHeading());
-  }
-
-  public void reset() {
-    odometry.resetPosition(new Pose2d(), getHeading());
-  }
-
-  @Override
-  public void periodic() {
-
-    pose = odometry.update(
-      getHeading(), 
-      falconFL.getSelectedSensorPosition() / 10.71 * 2 * Math.PI * Units.inchesToMeters(3.0) / 60, 
-      falconFR.getSelectedSensorPosition() / 10.71 * 2 * Math.PI * Units.inchesToMeters(3.0) / 60); //TODO FIX ME
-    printEncoderValues();
+  public void driveStraight(double xSpeed) {
+    drive.arcadeDrive(xSpeed, -driveTrainP());
   }
 
 }

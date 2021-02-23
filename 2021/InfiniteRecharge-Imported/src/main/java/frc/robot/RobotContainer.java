@@ -14,11 +14,13 @@ import java.util.List;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.XboxController;
 //import edu.wpi.first.wpilibj.Joystick; //TODO ButtonBoardTest
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.controller.RamseteController;
+import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
@@ -31,6 +33,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.ArcadeDriveClassic;
 import frc.robot.commands.ChangeLimelightAngle;
@@ -102,9 +105,6 @@ public class RobotContainer {
     new JoystickButton(helms, Button.kB.value).whenHeld(new ConveyorReverse(queueSub));
     new JoystickButton(helms, Button.kX.value).whenHeld(new IndexerBottomBeltRun(queueSub));
     new JoystickButton(helms, Button.kA.value).whenHeld(new ReverseQueue(queueSub));
-
-    //Button Board
-    //new JoystickButton(buttonBoard, Button).whenHeld(command); //TODO FIGURE THIS OUT (BUTTONBOARDTEST)
   }
 
   public XboxController getController() {
@@ -115,11 +115,6 @@ public class RobotContainer {
     return helms;
   }
 
-  //public Joystick getbuttonBoard() { //TODO BUTTONBOARDTEST
-    //return buttonBoard;
-  //}
-
-
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    * 
@@ -129,73 +124,56 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
 
-    //Create a voltage constraint to ensure we don't accelerate too fast
-
+    // Create a voltage constraint to ensure we don't accelerate to fast
     var autoVoltageConstraint =
-        new DifferentialDriveVoltageConstraint(
-            driveSub.getFeedForward(), 
-            DriveSubsystem.kinematics, 
-            10); //set under 12v to take into account "voltage sag" while robot is in use
+      new DifferentialDriveVoltageConstraint(
+        new SimpleMotorFeedforward(AutoConstants.ksVolts,
+                                   AutoConstants.kvVoltsSecondsPerMeter,
+                                   AutoConstants.kaVoltSecondsSquaredPerMeter),
+        driveSub.getKinematics(),
+        10);
+   
+        // Create config for trajectory
+        TrajectoryConfig config =
+          new TrajectoryConfig(AutoConstants.kMaxSpeedMetersPerSecond,
+                               AutoConstants.kMaxAccelerationMetersPerSecondSquared)
+        // Add kinematics to ensure max speed is actually obeyed
+        .setKinematics(driveSub.getKinematics())
+        // Apply the voltage constraint
+        .addConstraint(autoVoltageConstraint);
 
-    // Create config for trajectory
-    TrajectoryConfig config =
-        new TrajectoryConfig(AutoConstants.kMaxSpeedMetersPerSecond, 
-                             AutoConstants.kMaxAccelerationMetersPerSecondSquared)
-            // Add Kinematics to ensure max speed is actually obeyed
-            .setKinematics(DriveSubsystem.kinematics)
-            //Apply the Voltage constraint
-            .addConstraint(autoVoltageConstraint);
-
-    //An example trajectory to follow. All units in Meters.
-    //This is where you would import the Pathweaver Path
-
-    Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
-        // Start at the origin facing the +X Direction
-        new Pose2d(0, 0, new Rotation2d(0)), 
-        //Pass through these two interior waypoints, making an 's' curve path
-        List.of(
+        //Create an example trajectory
+        Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
+          //Start at the origin facing the +X direction
+          new Pose2d(0,0, new Rotation2d(0)),
+          //Pass through these two interior waypoints, making an 's' curve path
+          List.of(
             new Translation2d(1, 1),
             new Translation2d(2, -1)
-        ), 
-        // End 3 meters straight ahead of where we started, facing forward
-        new Pose2d(3, 0, new Rotation2d(0)), 
-        // Pass Config
-        config
-    );
+          ),
+          //End 3 meters straight ahead of where we started, facing forward
+           new Pose2d(3, 0, new Rotation2d(0)),
+           //pass config
+           config
+        );
 
+        RamseteCommand ramseteCommand = new RamseteCommand(
+          exampleTrajectory, driveSub::getPose, 
+          new RamseteController(AutoConstants.kRamseteB, AutoConstants.kRamseteZeta), 
+          new SimpleMotorFeedforward(AutoConstants.ksVolts, AutoConstants.kvVoltsSecondsPerMeter, AutoConstants.kaVoltSecondsSquaredPerMeter), 
+          driveSub.getKinematics(), 
+          driveSub::getWheelSpeeds, 
+          new PIDController(AutoConstants.kPDriveVel, 0, 0), 
+          new PIDController(AutoConstants.kPDriveVel, 0, 0), 
+          driveSub::tankDriveVolts, 
+          driveSub
+        );
 
-    /*String trajectoryJSON = "paths/BarrelRacing.wpilib.json";
-    Trajectory trajectory = new Trajectory();
-    try {
-        Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
-        trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
-    } catch (IOException ex) {
-        DriverStation.reportError("Unable to open trajectory: " + trajectoryJSON, ex.getStackTrace());
-    }*/
+        //Reset odometry to the starting pose of the trajectory
+        driveSub.resetOdeometry(exampleTrajectory.getInitialPose());
 
-    RamseteCommand ramseteCommand = new RamseteCommand(
-        exampleTrajectory, //trajectory
-        //trajectory,
-        driveSub::getPose, 
-        new RamseteController(AutoConstants.kRamseteB, AutoConstants.kRamseteZeta), 
-        driveSub.getFeedForward(),
-        driveSub.getKinematics(), 
-        driveSub::getSpeeds, 
-        driveSub.getLeftPidController(), 
-        driveSub.getLeftPidController(), 
-        driveSub::setOutputVolts, 
-        driveSub
-    );
+        //Run path following command, then stop at the end
+        return ramseteCommand.andThen(() -> driveSub.tankDriveVolts(0, 0));
 
-    //Reset odometry to the starting pose of the trajectory.
-    driveSub.resetOdometry(exampleTrajectory.getInitialPose());
-    //driveSub.resetOdometry(trajectory.getInitialPose());
-
-    //Run path following command, then stop at the end.
-    return ramseteCommand.andThen(() -> driveSub.setOutputVolts(0, 0));
-  }
-
-  public void reset() {
-    driveSub.reset();
   }
 }
