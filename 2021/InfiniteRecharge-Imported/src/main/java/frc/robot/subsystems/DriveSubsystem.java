@@ -2,18 +2,14 @@ package frc.robot.subsystems;
 
 //Motor Imports
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-
+import com.ctre.phoenix.platform.can.AutocacheState;
 //Sensor Imports
 import com.kauailabs.navx.frc.AHRS;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
-
 //Auto Imports
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
@@ -21,11 +17,13 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
-
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 //Util Imports
 import edu.wpi.first.wpilibj.util.Units;
+import frc.robot.Constants;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.VelocityConversions;
 
 
 /**
@@ -63,18 +61,35 @@ public class DriveSubsystem extends SubsystemBase {
 
    private double error;
    
+   //Diagnostics
+   /*etworkTableEntry m_xEntry = NetworkTableInstance.getDefault().getTable("troubleshooting").getEntry("X");
+   NetworkTableEntry m_yEntry = NetworkTableInstance.getDefault().getTable("troubleshooting").getEntry("Y");*/
 
     /**
      * Creates a new DriveSubsystem
      */
     public DriveSubsystem() {
         setBrake();
-        resetEncoders();
-        odometry = new DifferentialDriveOdometry(gyro.getRotation2d());
+
+        falconFR.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
+        falconFL.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
+
+       // printEncoderValues();
 
         //set followers
         falconBR.follow(falconFR);
         falconBL.follow(falconFL);
+
+       /* falconFR.setInverted(true); //set to invert falconFR.. CW/CCW.. Green = forward (motor led)
+        falconBR.setInverted(InvertType.FollowMaster); //matches whatever falconFR is
+
+        falconFL.setInverted(true);
+        falconBL.setInverted(InvertType.FollowMaster); */ //WUT
+
+        gyro.zeroYaw();
+        //odometry = new DifferentialDriveOdometry(gyro.getRotation2d());
+        odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(getHeading()));
+    
     }
 
     /**
@@ -90,7 +105,20 @@ public class DriveSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         //Update the odometry in the periodic block
-        odometry.update(gyro.getRotation2d(), falconFL.getSelectedSensorPosition(), falconFR.getSelectedSensorPosition());
+        //odometry.update(-gyro.getRotation2d().getDegrees(), falconFL.getSelectedSensorPosition() / 36128, falconFR.getSelectedSensorPosition() / 36128);
+        odometry.update(Rotation2d.fromDegrees(getHeading()), falconFL.getSelectedSensorPosition() / 36128, falconFR.getSelectedSensorPosition() / 36128); //getLeftEncoderDistance(), getRightEncoderDistance());
+
+        SmartDashboard.putNumber("AHRS", gyro.getCompassHeading());
+        SmartDashboard.putNumber("FR", falconFR.getSelectedSensorPosition() * Constants.VelocityConversions.SensorToMeters);
+        SmartDashboard.putNumber("FL", falconFL.getSelectedSensorPosition() * Constants.VelocityConversions.SensorToMeters);
+        SmartDashboard.putNumber("L EncoderDistance", getLeftEncoderDistance());
+        SmartDashboard.putNumber("R EncoderDistance", getRightEncoderDistance());
+
+        //odometry.update(gyroAngle, leftDistanceMeters, rightDistanceMeters)
+
+        /*var translation = odometry.getPoseMeters().getTranslation();
+        m_xEntry.setNumber(translation.getX());
+        m_yEntry.setNumber(translation.getY());*/
     }
 
     /**
@@ -108,7 +136,8 @@ public class DriveSubsystem extends SubsystemBase {
      * @return The Current wheel speeds
      */
     public DifferentialDriveWheelSpeeds getWheelSpeeds() {
-        return new DifferentialDriveWheelSpeeds(falconFL.getSelectedSensorVelocity() / 10.71 * 2 * Units.inchesToMeters(3.0) / 60, falconFR.getSelectedSensorVelocity() / 10.71 *2 * Units.inchesToMeters(3) / 60);
+        return new DifferentialDriveWheelSpeeds(falconFL.getSelectedSensorVelocity() / AutoConstants.gearRatio * 2 * Units.inchesToMeters(3.0) / 60, 
+                                                falconFR.getSelectedSensorVelocity() / AutoConstants.gearRatio * 2 * Units.inchesToMeters(3.0) / 60);
     }
 
     /**
@@ -119,6 +148,13 @@ public class DriveSubsystem extends SubsystemBase {
     public void resetOdeometry(Pose2d pose) {
         resetEncoders();
         odometry.resetPosition(pose, gyro.getRotation2d());
+        System.out.println("--odeometry reset--");
+        System.out.println("pose");
+        System.out.println(pose);
+        System.out.println("what is rotation2d");
+        System.out.println(gyro.getRotation2d());
+        System.out.println("What is my current heading");
+        System.out.println(getHeading());
     }
 
     /**
@@ -127,7 +163,7 @@ public class DriveSubsystem extends SubsystemBase {
      * @param fwd the command forward movement
      * @param rot the commanded rotation
      */
-    public void arcadeDrive(double fwd, double rot) { //TODO Change
+    public void arcadeDrive(double fwd, double rot) {
         drive.arcadeDrive(fwd, rot);
     }
 
@@ -138,8 +174,8 @@ public class DriveSubsystem extends SubsystemBase {
      * @param rightVolts the commanded right output
      */
     public void tankDriveVolts(double leftVolts, double rightVolts) {
-        SCG_L.setVoltage(leftVolts);
-        SCG_R.setVoltage(rightVolts);
+        SCG_L.setVoltage(leftVolts / 12);
+        SCG_R.setVoltage(-rightVolts / 12);
         drive.feed();
     }
     
@@ -147,10 +183,16 @@ public class DriveSubsystem extends SubsystemBase {
      * Resets the drive encoders to currently read a position of 0.
      */
      public void resetEncoders() {
-        falconFR.setSelectedSensorPosition(0);
-        falconFL.setSelectedSensorPosition(0);
-        falconBR.setSelectedSensorPosition(0);
-        falconBL.setSelectedSensorPosition(0);
+        //falconFR.setSelectedSensorPosition(0);
+        //falconFL.setSelectedSensorPosition(0);
+        falconFR.getSensorCollection().setIntegratedSensorPosition(0, DriveConstants.timeout_ms);
+        falconFL.getSensorCollection().setIntegratedSensorPosition(0, DriveConstants.timeout_ms);
+        System.out.println("YEET THE ENCODERS");
+        System.out.println("FR Sensor Position");
+        System.out.println(falconFR.getSelectedSensorPosition());
+        System.out.println("FL Sensor Position");
+        System.out.println(falconFL.getSelectedSensorPosition());
+        
     }
 
     /**
@@ -159,7 +201,7 @@ public class DriveSubsystem extends SubsystemBase {
     *@return the average of the two encoder readings
     */
     public double getAverageEncoderDistance() {
-        return (falconFL.getSelectedSensorPosition() + falconFR.getSelectedSensorPosition()) / 2.0; //TODO VERIFY
+        return (falconFL.getSelectedSensorPosition() + falconFR.getSelectedSensorPosition()) / 2.0;
     }
 
     /**
@@ -167,18 +209,26 @@ public class DriveSubsystem extends SubsystemBase {
      * 
      * @return the left drive encoder
      */
-    /*public Encoder getLeftEncoder() { //TODO FIX
-        return leftEncoder;
-    }*/
+    public void getLeftEncoder() {
+        falconFL.getSelectedSensorPosition();
+    }
 
     /**
      * Gets the right drive encoder
      * 
      * @return the right drive encoder
      */
-    /*public Encoder getRightEncoder() {
-        return rightEncoder;
-    }*/
+    public void getRightEncoder() {
+        falconFR.getSelectedSensorPosition();
+    }
+
+    public double getRightEncoderDistance() {
+        return falconFR.getSelectedSensorPosition() * (AutoConstants.gearRatio / VelocityConversions.SensorUnitsPerRotation) * (Math.PI * Units.inchesToMeters(6.0));
+    }
+
+    public double getLeftEncoderDistance() {
+        return falconFL.getSelectedSensorPosition() * (AutoConstants.gearRatio / VelocityConversions.SensorUnitsPerRotation) * (Math.PI * Units.inchesToMeters(6.0));
+    }
 
     /**
      * Sets the max output of the drive. Useful for scaling the drive to drive more slowly.
@@ -193,7 +243,7 @@ public class DriveSubsystem extends SubsystemBase {
      * Zeroes the heading of the robot.
      */
     public void zeroHeading() {
-        gyro.reset();
+        gyro.zeroYaw();
     }
 
     /**
@@ -202,8 +252,12 @@ public class DriveSubsystem extends SubsystemBase {
      * @return the robot's heading in degrees, from -180 to 180
      */
     public double getHeading() {
-        return gyro.getRotation2d().getDegrees();
-    }
+        //return -gyro.getRotation2d().getDegrees();
+        return -gyro.getYaw();
+    } 
+    //Gyro needs to be negative 
+    //NAVX CW = positive
+    
 
     /**
      * Returns the turn rate of the robot
@@ -213,6 +267,7 @@ public class DriveSubsystem extends SubsystemBase {
     public double getTurnRate() {
         return -gyro.getRate();
     }
+    
 
     /**
      * Returns Kinematics
@@ -251,6 +306,9 @@ public class DriveSubsystem extends SubsystemBase {
 
   public void driveStraight(double xSpeed) {
     drive.arcadeDrive(xSpeed, -driveTrainP());
+  }
+
+  public void printEncoderValues() {
   }
 
 }

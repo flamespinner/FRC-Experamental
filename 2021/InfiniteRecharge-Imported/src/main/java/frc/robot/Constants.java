@@ -7,8 +7,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
-
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
  * numerical or boolean constants. This class should not be used for any other
@@ -37,23 +35,36 @@ public final class Constants {
 
         public static final double DRIVE_P = 4;
         public static final double DRIVE_I = 1;
+
+        public static final int timeout_ms = 0;
     }
 
     public final class AutoConstants {
-        public static final double ksVolts = 0.574;
-        public static final double kvVoltsSecondsPerMeter = 2.64;
-        public static final double kaVoltSecondsSquaredPerMeter = 0.995;
+        public static final double ksVolts = 0.662;
+        public static final double kvVoltsSecondsPerMeter = 1.57;
+        public static final double ka = 0.143;
+        public static final double kaVoltSecondsSquaredPerMeter = 0.999;
 
-        public static final double kPDriveVel = 2.39;
-        public static final double kTrackwidthMeters = 0.609;
+        public static final double kPDriveVel = 1.35; //2.35 //TODO Troubleshoot
+        //Values to try: kP 2.81, 0.0151 
+        public static final double kTrackwidthMeters = 1.736225356863555;// Use calculated from FRC Tool
         
-        public static final double kMaxSpeedMetersPerSecond = 3;
-        public static final double kMaxAccelerationMetersPerSecondSquared = 3;
+        public static final double kMaxSpeedMetersPerSecond = 0.5; //3
+        public static final double kMaxAccelerationMetersPerSecondSquared = 0.5; //3
 
         public static final double kRamseteB = 2; //This should be good for most robots
         public static final double kRamseteZeta = 0.7; //This should be good for most robots
 
-        public static final double gearRatio = 10.71; //This shouldn't change
+        public static final double gearRatio = 8.75; //This shouldn't change
+    }
+
+    public static class VelocityConversions {
+        public static final double WheelCircumference = (6*Math.PI);
+        public static final double SensorUnitsPerRotation = 2048;
+        public static final double DriveBaseDeduction = 8.75;
+        public static final double InchesPerMeter = (39.37);
+        public static final double SensorToMeters = (1.0 / SensorUnitsPerRotation * WheelCircumference * (1.0 / InchesPerMeter) /2.0);
+        //public static final double WheelDiameterMeters = ();
     }
 
     /**

@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -24,6 +25,7 @@ import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
@@ -123,7 +125,18 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
+    driveSub.zeroHeading();
+    driveSub.resetEncoders();
+    driveSub.resetOdeometry(new Pose2d(0,0, new Rotation2d(0)));
 
+ /*   String trajectoryJSON = "paths/BarrelRacing.wpilib.json";
+Trajectory trajectory = new Trajectory();
+try {
+  Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
+  trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+} catch (IOException ex) {
+  DriverStation.reportError("Unable to open trajectory: " + trajectoryJSON, ex.getStackTrace());
+}*/
     // Create a voltage constraint to ensure we don't accelerate to fast
     var autoVoltageConstraint =
       new DifferentialDriveVoltageConstraint(
@@ -132,7 +145,8 @@ public class RobotContainer {
                                    AutoConstants.kaVoltSecondsSquaredPerMeter),
         driveSub.getKinematics(),
         10);
-   
+
+
         // Create config for trajectory
         TrajectoryConfig config =
           new TrajectoryConfig(AutoConstants.kMaxSpeedMetersPerSecond,
@@ -143,7 +157,7 @@ public class RobotContainer {
         .addConstraint(autoVoltageConstraint);
 
         //Create an example trajectory
-        Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
+        Trajectory trajectory = TrajectoryGenerator.generateTrajectory(
           //Start at the origin facing the +X direction
           new Pose2d(0,0, new Rotation2d(0)),
           //Pass through these two interior waypoints, making an 's' curve path
@@ -155,22 +169,38 @@ public class RobotContainer {
            new Pose2d(3, 0, new Rotation2d(0)),
            //pass config
            config
-        );
+        ); 
 
-        RamseteCommand ramseteCommand = new RamseteCommand(
-          exampleTrajectory, driveSub::getPose, 
-          new RamseteController(AutoConstants.kRamseteB, AutoConstants.kRamseteZeta), 
-          new SimpleMotorFeedforward(AutoConstants.ksVolts, AutoConstants.kvVoltsSecondsPerMeter, AutoConstants.kaVoltSecondsSquaredPerMeter), 
-          driveSub.getKinematics(), 
-          driveSub::getWheelSpeeds, 
-          new PIDController(AutoConstants.kPDriveVel, 0, 0), 
-          new PIDController(AutoConstants.kPDriveVel, 0, 0), 
-          driveSub::tankDriveVolts, 
-          driveSub
-        );
+
+      RamseteCommand ramseteCommand = new RamseteCommand(
+        trajectory, 
+        driveSub::getPose, 
+        new RamseteController(AutoConstants.kRamseteB, AutoConstants.kRamseteZeta), 
+        new SimpleMotorFeedforward(AutoConstants.ksVolts, AutoConstants.kvVoltsSecondsPerMeter, AutoConstants.kaVoltSecondsSquaredPerMeter), 
+        driveSub.getKinematics(), 
+        driveSub::getWheelSpeeds, 
+        new PIDController(AutoConstants.kPDriveVel, 0, 0),  //Left Controller
+        new PIDController(AutoConstants.kPDriveVel, 0, 0),  //Right Controller
+        driveSub::tankDriveVolts, 
+        driveSub
+      );
+
+      /* EXAMPLE RAMSETECOMMAND STRUCTURE
+      RamseteCommand = new RamseteCommand(
+        trajectory,
+        pose,
+        controller,
+        feedforward,
+        kinematics,
+        wheelSpeeds,
+        leftController,
+        rightController,
+        outputVolts,
+        requirements
+      );*/
 
         //Reset odometry to the starting pose of the trajectory
-        driveSub.resetOdeometry(exampleTrajectory.getInitialPose());
+        driveSub.resetOdeometry(trajectory.getInitialPose());
 
         //Run path following command, then stop at the end
         return ramseteCommand.andThen(() -> driveSub.tankDriveVolts(0, 0));
