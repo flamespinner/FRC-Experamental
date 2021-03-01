@@ -88,7 +88,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    //m_robotContainer.reset(); // TODO FIX
+    m_robotContainer.driveSub.resetOdeometry(); // TODO FIX
     m_robotContainer.getAutonomousCommand().schedule(); //TODO FIX
   }
 

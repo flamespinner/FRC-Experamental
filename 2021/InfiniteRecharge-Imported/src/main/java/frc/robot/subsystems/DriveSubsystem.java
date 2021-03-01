@@ -10,6 +10,8 @@ import com.kauailabs.navx.frc.AHRS;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 //Auto Imports
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
@@ -62,8 +64,8 @@ public class DriveSubsystem extends SubsystemBase {
    private double error;
    
    //Diagnostics
-   /*etworkTableEntry m_xEntry = NetworkTableInstance.getDefault().getTable("troubleshooting").getEntry("X");
-   NetworkTableEntry m_yEntry = NetworkTableInstance.getDefault().getTable("troubleshooting").getEntry("Y");*/
+   NetworkTableEntry m_xEntry = NetworkTableInstance.getDefault().getTable("troubleshooting").getEntry("X");
+   NetworkTableEntry m_yEntry = NetworkTableInstance.getDefault().getTable("troubleshooting").getEntry("Y");
 
     /**
      * Creates a new DriveSubsystem
@@ -116,9 +118,9 @@ public class DriveSubsystem extends SubsystemBase {
 
         //odometry.update(gyroAngle, leftDistanceMeters, rightDistanceMeters)
 
-        /*var translation = odometry.getPoseMeters().getTranslation();
+        var translation = odometry.getPoseMeters().getTranslation();
         m_xEntry.setNumber(translation.getX());
-        m_yEntry.setNumber(translation.getY());*/
+        m_yEntry.setNumber(translation.getY());
     }
 
     /**
