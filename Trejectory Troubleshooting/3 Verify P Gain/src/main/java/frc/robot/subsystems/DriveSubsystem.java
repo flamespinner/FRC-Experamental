@@ -108,10 +108,7 @@ public class DriveSubsystem extends SubsystemBase {
         //Update the odometry in the periodic block
         //odometry.update(-gyro.getRotation2d().getDegrees(), falconFL.getSelectedSensorPosition() / 36128, falconFR.getSelectedSensorPosition() / 36128);
         odometry.update(Rotation2d.fromDegrees(getHeading()), falconFL.getSelectedSensorPosition() / 36128, falconFR.getSelectedSensorPosition() / 36128); //getLeftEncoderDistance(), getRightEncoderDistance());
-
-        SmartDashboard.putNumber("AHRS", gyro.getCompassHeading());
-        SmartDashboard.putNumber("FR", falconFR.getSelectedSensorPosition() * Constants.VelocityConversions.SensorToMeters);
-        SmartDashboard.putNumber("FL", falconFL.getSelectedSensorPosition() * Constants.VelocityConversions.SensorToMeters);
+        
         SmartDashboard.putNumber("L EncoderDistance", getLeftEncoderDistance());
         SmartDashboard.putNumber("R EncoderDistance", getRightEncoderDistance());
 

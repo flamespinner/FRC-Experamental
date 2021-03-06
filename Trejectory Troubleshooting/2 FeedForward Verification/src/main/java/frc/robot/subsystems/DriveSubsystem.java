@@ -107,11 +107,8 @@ public class DriveSubsystem extends SubsystemBase {
     public void periodic() {
         //Update the odometry in the periodic block
         //odometry.update(-gyro.getRotation2d().getDegrees(), falconFL.getSelectedSensorPosition() / 36128, falconFR.getSelectedSensorPosition() / 36128);
-        odometry.update(Rotation2d.fromDegrees(getHeading()), falconFL.getSelectedSensorPosition() / 36128, falconFR.getSelectedSensorPosition() / 36128); //getLeftEncoderDistance(), getRightEncoderDistance());
+        odometry.update(Rotation2d.fromDegrees(getHeading()), getLeftEncoderDistance(), getRightEncoderDistance());
 
-        SmartDashboard.putNumber("AHRS", gyro.getCompassHeading());
-        SmartDashboard.putNumber("FR", falconFR.getSelectedSensorPosition() * Constants.VelocityConversions.SensorToMeters);
-        SmartDashboard.putNumber("FL", falconFL.getSelectedSensorPosition() * Constants.VelocityConversions.SensorToMeters);
         SmartDashboard.putNumber("L EncoderDistance", getLeftEncoderDistance());
         SmartDashboard.putNumber("R EncoderDistance", getRightEncoderDistance());
 
@@ -224,11 +221,11 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     public double getRightEncoderDistance() {
-        return falconFR.getSelectedSensorPosition() * (AutoConstants.gearRatio / VelocityConversions.SensorUnitsPerRotation) * (Math.PI * Units.inchesToMeters(6.0));
+        return falconFR.getSelectedSensorPosition() / (AutoConstants.CPR * AutoConstants.gearRatio) * VelocityConversions.WheelCircumference / VelocityConversions.InchesToMeter;
     }
 
     public double getLeftEncoderDistance() {
-        return falconFL.getSelectedSensorPosition() * (AutoConstants.gearRatio / VelocityConversions.SensorUnitsPerRotation) * (Math.PI * Units.inchesToMeters(6.0));
+        return falconFL.getSelectedSensorPosition() / (AutoConstants.CPR * AutoConstants.gearRatio) * VelocityConversions.WheelCircumference / VelocityConversions.InchesToMeter;
     }
 
     /**

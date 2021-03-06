@@ -45,26 +45,28 @@ public final class Constants {
         public static final double ka = 0.143;
         public static final double kaVoltSecondsSquaredPerMeter = 0.999;
 
-        public static final double kPDriveVel = 1.35; //2.35 //TODO Troubleshoot
-        public static final double kPDriveVel0 = 0.0; //DIAGNOSTICS ONLY
+        public static final double kPDriveVel = 1.35;
+        public static final double kPDriveVel0 = 0;
         //Values to try: kP 2.81, 0.0151 
         public static final double kTrackwidthMeters = 1.736225356863555;// Use calculated from FRC Tool
         
-        public static final double kMaxSpeedMetersPerSecond = 0.5; //3
-        public static final double kMaxAccelerationMetersPerSecondSquared = 0.5; //3
+        public static final double kMaxSpeedMetersPerSecond = 3; //3
+        public static final double kMaxAccelerationMetersPerSecondSquared =3; //3
 
+        //baseline values for Ramsete  follower in units of meters and seconds
         public static final double kRamseteB = 2; //This should be good for most robots
         public static final double kRamseteZeta = 0.7; //This should be good for most robots
 
-        public static final double gearRatio = 8.75; //This shouldn't change
+        public static final double gearRatio = 8.45; //This shouldn't change
+        public static final double CPR = 2048;
     }
 
     public static class VelocityConversions {
-        public static final double WheelCircumference = (6*Math.PI);
+        public static final double WheelCircumference = (2 * Math.PI * 3);
         public static final double SensorUnitsPerRotation = 2048;
         public static final double DriveBaseDeduction = 8.75;
-        public static final double InchesPerMeter = (39.37);
-        public static final double SensorToMeters = (1.0 / SensorUnitsPerRotation * WheelCircumference * (1.0 / InchesPerMeter) /2.0);
+        public static final double InchesToMeter = (39.37);
+        public static final double SensorToMeters = (1.0 / SensorUnitsPerRotation * WheelCircumference * (1.0 / InchesToMeter) /2.0);
         //public static final double WheelDiameterMeters = ();
     }
 

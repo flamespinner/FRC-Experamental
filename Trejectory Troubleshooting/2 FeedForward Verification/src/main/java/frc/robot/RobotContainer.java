@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -107,12 +108,10 @@ public class RobotContainer {
     driveSub.resetEncoders();
     driveSub.resetOdeometry(new Pose2d(0,0, new Rotation2d(0)));
 
-
-    var table = NetworkTableInstance.getDefault().getTable("troubleshooting");
-    var leftReference = table.getEntry("left_reference");
-    var leftMeasurement = table.getEntry("left_measurement");
-    var rightReference = table.getEntry("right_reference");
-    var rightMeasurement = table.getEntry("right_measurement");
+    NetworkTableEntry leftReference = NetworkTableInstance.getDefault().getTable("troubleshooting").getEntry("left_reference");
+    NetworkTableEntry leftMeasurement = NetworkTableInstance.getDefault().getTable("troubleshooting").getEntry("left_measurement");
+    NetworkTableEntry rightReference = NetworkTableInstance.getDefault().getTable("troubleshooting").getEntry("right_reference");
+    NetworkTableEntry rightMeasurement = NetworkTableInstance.getDefault().getTable("troubleshooting").getEntry("right_measurement");
 
  /*   String trajectoryJSON = "paths/BarrelRacing.wpilib.json";
 Trajectory trajectory = new Trajectory();
