@@ -46,11 +46,12 @@ public final class Constants {
         public static final double kaVoltSecondsSquaredPerMeter = 0.999;
 
         public static final double kPDriveVel = 1.35; //2.35 //TODO Troubleshoot
+        public static final double kPDriveVel0 = 0;
         //Values to try: kP 2.81, 0.0151 
         public static final double kTrackwidthMeters = 1.736225356863555;// Use calculated from FRC Tool
         
-        public static final double kMaxSpeedMetersPerSecond = 0.5; //3
-        public static final double kMaxAccelerationMetersPerSecondSquared = 0.5; //3
+        public static final double kMaxSpeedMetersPerSecond = 3; //3
+        public static final double kMaxAccelerationMetersPerSecondSquared =3; //3
 
         public static final double kRamseteB = 2; //This should be good for most robots
         public static final double kRamseteZeta = 0.7; //This should be good for most robots

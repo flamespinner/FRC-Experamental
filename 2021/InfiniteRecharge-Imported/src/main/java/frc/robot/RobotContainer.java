@@ -129,6 +129,13 @@ public class RobotContainer {
     driveSub.resetEncoders();
     driveSub.resetOdeometry(new Pose2d(0,0, new Rotation2d(0)));
 
+
+    var table = NetworkTableInstance.getDefault().getTable("troubleshooting");
+    var leftReference = table.getEntry("left_reference");
+    var leftMeasurement = table.getEntry("left_measurement");
+    var rightReference = table.getEntry("right_reference");
+    var rightMeasurement = table.getEntry("right_measurement");
+
  /*   String trajectoryJSON = "paths/BarrelRacing.wpilib.json";
 Trajectory trajectory = new Trajectory();
 try {
@@ -172,16 +179,31 @@ try {
         ); 
 
 
+        RamseteController disabledRamsete = new RamseteController() {
+          @Override
+          public ChassisSpeeds calculate(Pose2d currentPose, Pose2d poseRef, double linearVelocityRefMeters,
+                  double angularVelocityRefRadiansPerSecond) {
+              return new ChassisSpeeds(linearVelocityRefMeters, 0.0, angularVelocityRefRadiansPerSecond);
+          }
+        };
+
+        var leftController = new PIDController(AutoConstants.kPDriveVel0, 0, 0);
+        var rightController = new PIDController(AutoConstants.kPDriveVel0, 0, 0);
+
+
       RamseteCommand ramseteCommand = new RamseteCommand(
         trajectory, 
         driveSub::getPose, 
+        //disabledRamsete,
         new RamseteController(AutoConstants.kRamseteB, AutoConstants.kRamseteZeta), 
         new SimpleMotorFeedforward(AutoConstants.ksVolts, AutoConstants.kvVoltsSecondsPerMeter, AutoConstants.kaVoltSecondsSquaredPerMeter), 
         driveSub.getKinematics(), 
         driveSub::getWheelSpeeds, 
+        //leftController,
+        //rightController,
         new PIDController(AutoConstants.kPDriveVel, 0, 0),  //Left Controller
         new PIDController(AutoConstants.kPDriveVel, 0, 0),  //Right Controller
-        driveSub::tankDriveVolts, 
+        driveSub::tankDriveVolts,
         driveSub
       );
 
@@ -205,5 +227,8 @@ try {
         //Run path following command, then stop at the end
         return ramseteCommand.andThen(() -> driveSub.tankDriveVolts(0, 0));
 
+  }
+  public void reset() {
+    driveSub.resetOdeometry();
   }
 }
