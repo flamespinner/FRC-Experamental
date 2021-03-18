@@ -55,7 +55,7 @@ import java.util.ArrayList;
 
 public class Robot extends TimedRobot {
 
-  static private double ENCODER_EDGES_PER_REV = 2048 / 4.;
+  static private int ENCODER_EDGES_PER_REV = 2048;
   static private int PIDIDX = 0;
   static private int ENCODER_EPR = 2048;
   static private double GEARING = 10.75;
@@ -99,12 +99,19 @@ public class Robot extends TimedRobot {
   public WPI_TalonFX setupWPI_TalonFX(int port, Sides side, boolean inverted) {
     // create new motor and set neutral modes (if needed)
     WPI_TalonFX motor = new WPI_TalonFX(port);
+    // setup talon
+    motor.configFactoryDefault();
+    motor.setNeutralMode(NeutralMode.Brake);
     motor.setInverted(inverted);
     
     // setup encoder if motor isn't a follower
     if (side != Sides.FOLLOWER) {
     
-      Encoder encoder;
+      
+      motor.configSelectedFeedbackSensor(
+            FeedbackDevice.IntegratedSensor,
+            PIDIDX, 10
+      );    
 
 
 
@@ -114,21 +121,25 @@ public class Robot extends TimedRobot {
       case RIGHT:
         // set right side methods = encoder methods
 
-        encoder = new Encoder(3, 4);
-        encoder.setReverseDirection(false);
+          
+        motor.setSensorPhase(true);
+        rightEncoderPosition = ()
+          -> motor.getSelectedSensorPosition(PIDIDX) * encoderConstant;
+        rightEncoderRate = ()
+          -> motor.getSelectedSensorVelocity(PIDIDX) * encoderConstant *
+               10;
 
-        encoder.setDistancePerPulse(encoderConstant);
-        rightEncoderPosition = encoder::getDistance;
-        rightEncoderRate = encoder::getRate;
 
         break;
       case LEFT:
-        encoder = new Encoder(1, 2);
-        encoder.setReverseDirection(false);
-        encoder.setDistancePerPulse(encoderConstant);
-        leftEncoderPosition = encoder::getDistance;
-        leftEncoderRate = encoder::getRate;
-
+        motor.setSensorPhase(false);
+        
+        leftEncoderPosition = ()
+          -> motor.getSelectedSensorPosition(PIDIDX) * encoderConstant;
+        leftEncoderRate = ()
+          -> motor.getSelectedSensorVelocity(PIDIDX) * encoderConstant *
+               10;
+        
 
         break;
       default:
@@ -153,19 +164,13 @@ public class Robot extends TimedRobot {
     // create left motor
     WPI_TalonFX leftMotor = setupWPI_TalonFX(43, Sides.LEFT, false);
 
-    ArrayList<SpeedController> leftMotors = new ArrayList<SpeedController>();
-    leftMotors.add(setupWPI_TalonFX(42, Sides.FOLLOWER, false));
-    SpeedController[] leftMotorControllers = new SpeedController[leftMotors.size()];
-    leftMotorControllers = leftMotors.toArray(leftMotorControllers);
-    SpeedControllerGroup leftGroup = new SpeedControllerGroup(leftMotor, leftMotorControllers);
+    WPI_TalonFX leftFollowerID42 = setupWPI_TalonFX(42, Sides.FOLLOWER, false);
+    leftFollowerID42.follow(leftMotor);
 
-    WPI_TalonFX rightMotor = setupWPI_TalonFX(44, Sides.RIGHT, true);
-    ArrayList<SpeedController> rightMotors = new ArrayList<SpeedController>();
-    rightMotors.add(setupWPI_TalonFX(41, Sides.FOLLOWER, true));
-    SpeedController[] rightMotorControllers = new SpeedController[rightMotors.size()];
-    rightMotorControllers = rightMotors.toArray(rightMotorControllers);
-    SpeedControllerGroup rightGroup = new SpeedControllerGroup(rightMotor, rightMotorControllers);
-    drive = new DifferentialDrive(leftGroup, rightGroup);
+    WPI_TalonFX rightMotor = setupWPI_TalonFX(44, Sides.RIGHT, false);
+    WPI_TalonFX rightFollowerID41 = setupWPI_TalonFX(41, Sides.FOLLOWER, false);    
+    rightFollowerID41.follow(rightMotor);
+    drive = new DifferentialDrive(leftMotor, rightMotor);
     drive.setDeadband(0);
 
     //

@@ -26,14 +26,14 @@
     # Encoder ports (leave empty "[]" if not needed)
     # Specifying encoder ports indicates you want to use Rio-side encoders
     # If doing drive test, treat this as the left side of the drivetrain
-    "encoderPorts": [1, 2],
+    "encoderPorts": [],
     # Only if you are doing drive (leave empty "[]" if not)
-    "rightEncoderPorts": [3, 4],
+    "rightEncoderPorts": [],
     # Set to True if encoders need to be inverted
     # If doing drive test, treat this as the left side of the drivetrain
     "encoderInverted": False,
     # Only if you are doing drive (set to False if not needed)
-    "rightEncoderInverted": true,
+    "rightEncoderInverted": True,
     # ** The following is only if you are using a gyro for the DriveTrain test**
     # Gyro type (one of "NavX", "Pigeon", "ADXRS450", "AnalogGyro", or "None")
     "gyroType": "NavX",
@@ -47,6 +47,7 @@
     # "" (NavX using default SPI, ADXRS450 using onboard CS0, or no gyro)
     "gyroPort": "SPI.Port.kMXP",
 }
+
 
 
 
