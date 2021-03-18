@@ -4,7 +4,6 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-import com.ctre.phoenix.platform.can.AutocacheState;
 //Sensor Imports
 import com.kauailabs.navx.frc.AHRS;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
@@ -64,8 +63,8 @@ public class DriveSubsystem extends SubsystemBase {
    private double error;
    
    //Diagnostics
-   NetworkTableEntry m_xEntry = NetworkTableInstance.getDefault().getTable("troubleshooting").getEntry("X");
-   NetworkTableEntry m_yEntry = NetworkTableInstance.getDefault().getTable("troubleshooting").getEntry("Y");
+   //NetworkTableEntry m_xEntry = NetworkTableInstance.getDefault().getTable("troubleshooting").getEntry("X");
+   //NetworkTableEntry m_yEntry = NetworkTableInstance.getDefault().getTable("troubleshooting").getEntry("Y");
 
     /**
      * Creates a new DriveSubsystem
@@ -76,12 +75,17 @@ public class DriveSubsystem extends SubsystemBase {
         falconFR.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
         falconFL.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
 
+       // printEncoderValues();
+
         //set followers
         falconBR.follow(falconFR);
         falconBL.follow(falconFL);
 
-        resetEncoders();
-        setBrake();
+       /* falconFR.setInverted(true); //set to invert falconFR.. CW/CCW.. Green = forward (motor led)
+        falconBR.setInverted(InvertType.FollowMaster); //matches whatever falconFR is
+
+        falconFL.setInverted(true);
+        falconBL.setInverted(InvertType.FollowMaster); */ //WUT
 
         gyro.zeroYaw();
         //odometry = new DifferentialDriveOdometry(gyro.getRotation2d());
@@ -102,20 +106,17 @@ public class DriveSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         //Update the odometry in the periodic block
-        odometry.update(gyro.getRotation2d(), getLeftEncoderDistance(), getRightEncoderDistance()); 
-
-        SmartDashboard.putNumber("AHRS", gyro.getCompassHeading());
-        SmartDashboard.putNumber("FR", falconFR.getSelectedSensorPosition() * Constants.VelocityConversions.SensorToMeters);
-        SmartDashboard.putNumber("FL", falconFL.getSelectedSensorPosition() * Constants.VelocityConversions.SensorToMeters);
+        //odometry.update(-gyro.getRotation2d().getDegrees(), falconFL.getSelectedSensorPosition() / 36128, falconFR.getSelectedSensorPosition() / 36128);
+        odometry.update(Rotation2d.fromDegrees(getHeading()), falconFL.getSelectedSensorPosition() / 36128, falconFR.getSelectedSensorPosition() / 36128); //getLeftEncoderDistance(), getRightEncoderDistance());
+        
         SmartDashboard.putNumber("L EncoderDistance", getLeftEncoderDistance());
         SmartDashboard.putNumber("R EncoderDistance", getRightEncoderDistance());
 
         //odometry.update(gyroAngle, leftDistanceMeters, rightDistanceMeters)
 
-        var translation = odometry.getPoseMeters().getTranslation();
-        m_xEntry.setNumber(translation.getX());
-        m_yEntry.setNumber(translation.getY());
-
+        //var translation = odometry.getPoseMeters().getTranslation();
+        //m_xEntry.setNumber(translation.getX());
+        //m_yEntry.setNumber(translation.getY());
     }
 
     /**
@@ -132,18 +133,9 @@ public class DriveSubsystem extends SubsystemBase {
      * 
      * @return The Current wheel speeds
      */
-    public DifferentialDriveWheelSpeeds getWheelSpeeds() { 
-        /*return new DifferentialDriveWheelSpeeds(
-            falconFL.getSelectedSensorVelocity() * AutoConstants.gearRatio * 10.0 / VelocityConversions.SensorUnitsPerRotation
-                * Units.inchesToMeters(VelocityConversions.WheelCircumference),
-            falconFR.getSelectedSensorVelocity() * AutoConstants.gearRatio * 10.0 / VelocityConversions.SensorUnitsPerRotation
-                * Units.inchesToMeters(VelocityConversions.WheelCircumference));*/
-        return new DifferentialDriveWheelSpeeds(falconFL.getSelectedSensorVelocity(), falconFR.getSelectedSensorVelocity());
-
-        /*return new DifferentialDriveWheelSpeeds(falconFL.getSelectedSensorVelocity() / 2048 * Wheel_Diameter, falconFR.getSelectedSensorVelocity() / 2048 * Wheel_Diameter);
-
-        /*return new DifferentialDriveWheelSpeeds(falconFL.getSelectedSensorVelocity() / AutoConstants.gearRatio * 2 * Units.inchesToMeters(3.0) / 60, 
-                                                falconFR.getSelectedSensorVelocity() / AutoConstants.gearRatio * 2 * Units.inchesToMeters(3.0) / 60);*/
+    public DifferentialDriveWheelSpeeds getWheelSpeeds() {
+        return new DifferentialDriveWheelSpeeds(falconFL.getSelectedSensorVelocity() / AutoConstants.gearRatio * 2 * Units.inchesToMeters(3.0) / 60, 
+                                                falconFR.getSelectedSensorVelocity() / AutoConstants.gearRatio * 2 * Units.inchesToMeters(3.0) / 60);
     }
 
     /**
@@ -193,11 +185,12 @@ public class DriveSubsystem extends SubsystemBase {
         //falconFL.setSelectedSensorPosition(0);
         falconFR.getSensorCollection().setIntegratedSensorPosition(0, DriveConstants.timeout_ms);
         falconFL.getSensorCollection().setIntegratedSensorPosition(0, DriveConstants.timeout_ms);
-        falconBR.getSensorCollection().setIntegratedSensorPosition(0, DriveConstants.timeout_ms);
-        falconBL.getSensorCollection().setIntegratedSensorPosition(0, DriveConstants.timeout_ms);
-
-        System.out.println("ENCODERS REST");
-
+        System.out.println("YEET THE ENCODERS");
+        System.out.println("FR Sensor Position");
+        System.out.println(falconFR.getSelectedSensorPosition());
+        System.out.println("FL Sensor Position");
+        System.out.println(falconFL.getSelectedSensorPosition());
+        
     }
 
     /**
@@ -205,12 +198,8 @@ public class DriveSubsystem extends SubsystemBase {
     *
     *@return the average of the two encoder readings
     */
-    public double getAverageEncoderDistanceFL() {
+    public double getAverageEncoderDistance() {
         return (falconFL.getSelectedSensorPosition() + falconFR.getSelectedSensorPosition()) / 2.0;
-    }
-
-    public double getAverageEncoderDistanceFR() {
-        return (falconFR.getSelectedSensorPosition() + falconFL.getSelectedSensorPosition() / 2.0);
     }
 
     /**
