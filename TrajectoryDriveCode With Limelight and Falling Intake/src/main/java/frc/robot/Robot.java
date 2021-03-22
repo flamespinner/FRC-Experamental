@@ -23,8 +23,8 @@ import edu.wpi.first.wpilibj.SPI;
  */
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
-  private Command m_autonomousCommandAutoSearch;
-  private SequentialCommandGroup autoSearch;
+  private AutoCross autoCross;
+  private SequentialCommandGroup autoCrossSCG;
   public static RobotContainer m_robotContainer;
 
   AHRS navx = new AHRS(SPI.Port.kMXP);
@@ -38,15 +38,12 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
 
-      
-
-
       m_robotContainer = new RobotContainer();
-  
+      autoCross = new AutoCross(m_robotContainer.driveSub); //TODO test
 
+ //       autoCrossSCG = new SequentialCommandGroup(new AutoCross(m_robotContainer.driveSub),
+ //                                                 new m_robotContainer.getAutonomousCommand());
 
-      autoSearch = new SequentialCommandGroup(
-      new AutoCross(m_robotContainer.driveSub), new AutoCommand());
   
     navx.zeroYaw();
   }
@@ -78,14 +75,12 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-    m_autonomousCommandAutoSearch = m_robotContainer.getAutoSearch();
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
-      autoSearch.schedule();
-      System.out.println("autoSearch Ran");
+      autoCross.schedule();
+      navx.zeroYaw();
       m_autonomousCommand.schedule();
-      System.out.println("Pathweaver ran");
     }
   }
   /*public void autonomousInit() {
