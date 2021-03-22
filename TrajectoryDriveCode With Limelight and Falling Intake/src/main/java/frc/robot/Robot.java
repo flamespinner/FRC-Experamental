@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.SPI;
  */
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
+  private Command m_autonomousCommandAutoSearch;
   private SequentialCommandGroup autoSearch;
   public static RobotContainer m_robotContainer;
 
@@ -77,6 +78,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    m_autonomousCommandAutoSearch = m_robotContainer.getAutoSearch();
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
