@@ -76,6 +76,17 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+
+    // schedule the autonomous command (example)
+    if (m_autonomousCommand != null) {
+      autoSearch.schedule();
+      System.out.println("autoSearch Ran");
+      m_autonomousCommand.schedule();
+      System.out.println("Pathweaver ran");
+    }
+  }
+  /*public void autonomousInit() {
     
 
         // schedule the autonomous command (example)
@@ -83,7 +94,7 @@ public class Robot extends TimedRobot {
       try{autoSearch.schedule();}
       catch (Exception e) {System.out.println("FAILED TO MAKE COMMAND 10000");}
       //new IntakeBalls(m_robotContainer.queueSub).schedule();;
-    }
+    }*/
   
   /** This function is called periodically during autonomous. */
   @Override
