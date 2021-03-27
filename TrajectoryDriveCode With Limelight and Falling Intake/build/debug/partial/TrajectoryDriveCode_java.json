@@ -1,0 +1,13 @@
+[
+  {
+    "name": "TrajectoryDriveCode (in project TrajectoryDriveCode)",
+    "file": "C:\\Users\\flamespinner\\Desktop\\TrajectoryTesting-master\\TrajectoryDriveCode\\build\\libs\\TrajectoryDriveCode.jar",
+    "extensions": [
+      "C:\\Users\\flamespinner\\Desktop\\TrajectoryTesting-master\\TrajectoryDriveCode\\build\\tmp\\expandedArchives\\halsim_gui-2021.2.2-windowsx86-64.zip_d9b742accb7d26f71bdac05b796e7cc3\\windows\\x86-64\\shared\\halsim_gui.dll",
+      "C:\\Users\\flamespinner\\Desktop\\TrajectoryTesting-master\\TrajectoryDriveCode\\build\\tmp\\expandedArchives\\halsim_ds_socket-2021.2.2-windowsx86-64.zip_32ee0d595231a6c6d5a0455f7d794cf5\\windows\\x86-64\\shared\\halsim_ds_socket.dll"
+    ],
+    "env": {},
+    "librarydir": "C:\\Users\\flamespinner\\Desktop\\TrajectoryTesting-master\\TrajectoryDriveCode\\build\\tmp\\jniExtractDir",
+    "mainclass": "frc.robot.Main"
+  }
+]
