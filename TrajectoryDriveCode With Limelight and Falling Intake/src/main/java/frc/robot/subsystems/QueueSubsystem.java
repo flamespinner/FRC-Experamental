@@ -28,7 +28,6 @@ public class QueueSubsystem extends SubsystemBase {
   //delcaring and intializing conveyor motor
   private WPI_TalonSRX conveyor = new WPI_TalonSRX(QueueConstants.CONVEYOR_RED_ID_1);
 
-  private DigitalInput transmitter = new DigitalInput(QueueConstants.LINEBREAK_TRANSMITTER_ID);
   private DigitalInput reciver = new DigitalInput(QueueConstants.LINEBREAK_RECIVER_ID);
 
   /**

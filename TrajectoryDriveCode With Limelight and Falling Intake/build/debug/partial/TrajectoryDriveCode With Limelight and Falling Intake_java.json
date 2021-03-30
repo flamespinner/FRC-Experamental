@@ -1,0 +1,13 @@
+[
+  {
+    "name": "TrajectoryDriveCode With Limelight and Falling Intake (in project TrajectoryDriveCode With Limelight and Falling Intake)",
+    "file": "D:\\Users\\flame\\Documents\\GitHub\\FRC-Experamental-3926\\TrajectoryDriveCode With Limelight and Falling Intake\\build\\libs\\TrajectoryDriveCode With Limelight and Falling Intake.jar",
+    "extensions": [
+      "D:\\Users\\flame\\Documents\\GitHub\\FRC-Experamental-3926\\TrajectoryDriveCode With Limelight and Falling Intake\\build\\tmp\\expandedArchives\\halsim_gui-2021.2.2-windowsx86-64.zip_d9b742accb7d26f71bdac05b796e7cc3\\windows\\x86-64\\shared\\halsim_gui.dll",
+      "D:\\Users\\flame\\Documents\\GitHub\\FRC-Experamental-3926\\TrajectoryDriveCode With Limelight and Falling Intake\\build\\tmp\\expandedArchives\\halsim_ds_socket-2021.2.2-windowsx86-64.zip_32ee0d595231a6c6d5a0455f7d794cf5\\windows\\x86-64\\shared\\halsim_ds_socket.dll"
+    ],
+    "env": {},
+    "librarydir": "D:\\Users\\flame\\Documents\\GitHub\\FRC-Experamental-3926\\TrajectoryDriveCode With Limelight and Falling Intake\\build\\tmp\\jniExtractDir",
+    "mainclass": "frc.robot.Main"
+  }
+]
