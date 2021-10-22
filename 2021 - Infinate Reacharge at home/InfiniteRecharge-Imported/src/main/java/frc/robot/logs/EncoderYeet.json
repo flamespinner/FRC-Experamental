@@ -1,0 +1,125 @@
+[
+    {
+        "timestamp": 14.517578125,
+        "seqNumber": 5982,
+        "numOccur": 1,
+        "errorCode": 1,
+        "flags": 0,
+        "details": "Loop time of 0.02s overrun\n",
+        "location": "edu.wpi.first.wpilibj.IterativeRobotBase.printLoopOverrunMessage(IterativeRobotBase.java:301)",
+        "callStack": "",
+        "messageType": 1
+    },
+    {
+        "messageType": 2,
+        "timestamp": 14.5185546875,
+        "seqNumber": 5983,
+        "line": "Warning at edu.wpi.first.wpilibj.IterativeRobotBase.printLoopOverrunMessage(IterativeRobotBase.java:301): Loop time of 0.02s overrun"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 14.51904296875,
+        "seqNumber": 5984,
+        "line": ""
+    },
+    {
+        "timestamp": 14.53369140625,
+        "seqNumber": 5985,
+        "numOccur": 1,
+        "errorCode": 1,
+        "flags": 1,
+        "details": "DifferentialDrive... Output not updated often enough.",
+        "location": "edu.wpi.first.wpilibj.MotorSafety.check(MotorSafety.java:96)",
+        "callStack": "",
+        "messageType": 0
+    },
+    {
+        "messageType": 2,
+        "timestamp": 14.53466796875,
+        "seqNumber": 5986,
+        "line": "Error at edu.wpi.first.wpilibj.MotorSafety.check(MotorSafety.java:96): DifferentialDrive... Output not updated often enough."
+    },
+    {
+        "messageType": 2,
+        "timestamp": 15.240234375,
+        "seqNumber": 5987,
+        "line": "YEET THE ENCODERS"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 15.2421875,
+        "seqNumber": 5988,
+        "line": "FR"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 15.2431640625,
+        "seqNumber": 5989,
+        "line": "-214557.0"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 15.244140625,
+        "seqNumber": 5990,
+        "line": "FL"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 15.2451171875,
+        "seqNumber": 5991,
+        "line": "106865.0"
+    },
+    {
+        "timestamp": 15.3017578125,
+        "seqNumber": 5992,
+        "numOccur": 1,
+        "errorCode": 1,
+        "flags": 0,
+        "details": "\tautonomousInit(): 0.759065s\n\tSmartDashboard.updateValues(): 0.000048s\n\trobotPeriodic(): 0.005031s\n\tLiveWindow.updateValues(): 0.030297s\n\tShuffleboard.update(): 0.000029s\n\tautonomousPeriodic(): 0.004954s\n",
+        "location": "edu.wpi.first.wpilibj.Tracer.lambda$printEpochs$0(Tracer.java:63)",
+        "callStack": "",
+        "messageType": 1
+    },
+    {
+        "messageType": 2,
+        "timestamp": 15.302734375,
+        "seqNumber": 5993,
+        "line": "Warning at edu.wpi.first.wpilibj.Tracer.lambda$printEpochs$0(Tracer.java:63): \tautonomousInit(): 0.759065s"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 15.3037109375,
+        "seqNumber": 5994,
+        "line": "\tSmartDashboard.updateValues(): 0.000048s"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 15.30419921875,
+        "seqNumber": 5995,
+        "line": "\trobotPeriodic(): 0.005031s"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 15.30517578125,
+        "seqNumber": 5996,
+        "line": "\tLiveWindow.updateValues(): 0.030297s"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 15.30810546875,
+        "seqNumber": 5997,
+        "line": "\tShuffleboard.update(): 0.000029s"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 15.31005859375,
+        "seqNumber": 5998,
+        "line": "\tautonomousPeriodic(): 0.004954s"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 15.310546875,
+        "seqNumber": 5999,
+        "line": ""
+    }
+]
